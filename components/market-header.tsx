@@ -1,3 +1,4 @@
+import { Landmark } from "lucide-react";
 import { market } from "@/lib/market";
 
 export function MarketHeader() {
@@ -12,7 +13,9 @@ export function MarketHeader() {
       </div>
 
       <div className="flex items-start gap-3">
-        <div className="mt-1 h-11 w-11 shrink-0 rounded-xl bg-gradient-to-br from-gray-700 to-gray-900" />
+        <div className="mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-gray-700 to-gray-900 text-white">
+          <Landmark size={20} strokeWidth={2} />
+        </div>
         <h1 className="text-[22px] font-bold leading-tight text-gray-900 sm:text-[26px]">{market.title}</h1>
       </div>
 

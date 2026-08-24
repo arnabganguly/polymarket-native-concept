@@ -9,6 +9,7 @@ import { TrustCard } from "@/components/trust-card";
 import { UnderstandPanel } from "@/components/understand-panel";
 import { ParticipatePanel } from "@/components/participate-panel";
 import { DistributePanel } from "@/components/distribute-panel";
+import { CommentsPanel } from "@/components/comments-panel";
 import { PresentationBar } from "@/components/presentation-bar";
 import { ConceptFooter } from "@/components/concept-footer";
 import { useExperience } from "@/lib/experience-context";
@@ -34,6 +35,8 @@ export default function Home() {
             <OutcomesPanel />
 
             {enhanced && <UnderstandPanel />}
+
+            <CommentsPanel />
           </div>
 
           <div className="lg:sticky lg:top-20 lg:self-start">

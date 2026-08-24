@@ -74,9 +74,18 @@ export function ProbabilityChart() {
       <div className="flex items-end justify-between">
         <div>
           <div className="text-[13px] font-medium text-gray-500">{selectedOutcome.label}</div>
-          <div className="text-[40px] font-bold leading-none text-gray-900">
-            {selectedOutcome.probability}%
-            <span className="ml-2 align-middle text-[13px] font-semibold text-emerald-600">▲ 8 pts</span>
+          <div className="flex items-center gap-2">
+            <div className="text-[40px] font-bold leading-none text-gray-900">
+              {selectedOutcome.probability}%
+              <span className="ml-2 align-middle text-[13px] font-semibold text-emerald-600">▲ 8 pts</span>
+            </div>
+            <span className="mb-1 flex items-center gap-1 rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-bold tracking-wide text-rose-600">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-500 opacity-75" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-rose-600" />
+              </span>
+              LIVE
+            </span>
           </div>
         </div>
         <div className="flex gap-1 text-[12px] font-semibold text-gray-400">
@@ -101,7 +110,13 @@ export function ProbabilityChart() {
           </defs>
           <path d={areaPath} fill="url(#chartFill)" />
           <path d={path} fill="none" stroke="#1652F0" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
-          <circle cx={coords[coords.length - 1].x} cy={coords[coords.length - 1].y} r={4} fill="#1652F0" />
+
+          {/* Live indicator: pulsing rings behind a solid dot at the latest point */}
+          <circle cx={coords[coords.length - 1].x} cy={coords[coords.length - 1].y} r={4} fill="#1652F0" opacity={0.5}>
+            <animate attributeName="r" values="4;14;4" dur="2.2s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.45;0;0.45" dur="2.2s" repeatCount="indefinite" />
+          </circle>
+          <circle cx={coords[coords.length - 1].x} cy={coords[coords.length - 1].y} r={4} fill="#1652F0" stroke="#fff" strokeWidth={1.5} />
 
           {/* Event markers (Polymarket+ only) */}
           {enhanced &&
