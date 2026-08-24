@@ -3,6 +3,7 @@
 import { ShieldCheck } from "lucide-react";
 import { trustBand, trustBandCopy, trustFactors, trustSignal, type TrustBand } from "@/lib/trust";
 import { InfoTooltip } from "@/components/info-tooltip";
+import { MapImpactChip } from "@/components/map-impact-chip";
 import { pillars } from "@/lib/pillars";
 
 const bandStyles: Record<TrustBand, { bar: string; text: string; badge: string }> = {
@@ -29,6 +30,8 @@ export function TrustCard() {
           <InfoTooltip accent={p.accent} text={trustSignal.infoTooltip} />
         </div>
       </div>
+
+      <MapImpactChip accent={p.accent} driver={p.mapDriver} impact={p.mapImpact} />
 
       <div className="flex items-center gap-3">
         <div

@@ -1,14 +1,53 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowLeft, Pause, Play } from "lucide-react";
 import { pillars } from "@/lib/pillars";
 import { withBasePath } from "@/lib/experience-context";
 import { PresentationBar } from "@/components/presentation-bar";
 
 const loop = [pillars.understand, pillars.trust, pillars.participate, pillars.distribute];
+const LOOP_SECONDS = 6;
 
 export function VisionView() {
+  const [running, setRunning] = useState(true);
+  const [progress, setProgress] = useState(0); // 0..1 around the loop
+  const [loopsCompleted, setLoopsCompleted] = useState(0);
+  const rafRef = useRef<number | null>(null);
+  const lastTsRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!running) return;
+    const tick = (ts: number) => {
+      if (lastTsRef.current === null) lastTsRef.current = ts;
+      const dt = (ts - lastTsRef.current) / 1000;
+      lastTsRef.current = ts;
+      setProgress((prev) => {
+        let next = prev + dt / LOOP_SECONDS;
+        if (next >= 1) {
+          next -= 1;
+          setLoopsCompleted((c) => c + 1);
+        }
+        return next;
+      });
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      lastTsRef.current = null;
+    };
+  }, [running]);
+
+  const angle = progress * 2 * Math.PI - Math.PI / 2;
+  const r = 170;
+  const dotX = 200 + r * Math.cos(angle);
+  const dotY = 200 + r * Math.sin(angle);
+
+  const activeIndex = Math.floor(progress * loop.length) % loop.length;
+  const mapMultiplier = 1 + loopsCompleted * 0.6;
+
   return (
     <div className="mx-auto flex min-h-[calc(100vh-56px)] max-w-[1000px] flex-col items-center justify-center gap-8 px-6 py-16">
       <Link
@@ -36,38 +75,62 @@ export function VisionView() {
         </div>
 
         {loop.map((p, i) => {
-          const angle = (i / loop.length) * 2 * Math.PI - Math.PI / 2;
-          const r = 170;
-          const x = 200 + r * Math.cos(angle);
-          const y = 200 + r * Math.sin(angle);
+          const pAngle = (i / loop.length) * 2 * Math.PI - Math.PI / 2;
+          const x = 200 + r * Math.cos(pAngle);
+          const y = 200 + r * Math.sin(pAngle);
+          const isActive = i === activeIndex;
           return (
             <div
               key={p.id}
-              className="absolute flex h-20 w-20 flex-col items-center justify-center rounded-full border text-center shadow-sm"
+              className="absolute flex h-20 w-20 flex-col items-center justify-center rounded-full border text-center shadow-sm transition-all duration-300"
               style={{
                 left: x - 40,
                 top: y - 40,
-                background: p.wash,
+                background: isActive ? p.accent : p.wash,
                 borderColor: p.border,
-                color: p.accent,
+                color: isActive ? "#fff" : p.accent,
+                transform: isActive ? "scale(1.14)" : "scale(1)",
+                boxShadow: isActive ? `0 6px 20px ${p.accent}55` : undefined,
               }}
             >
               <span className="text-[11px] font-extrabold">{p.label}</span>
             </div>
           );
         })}
+
+        {/* animated pulse traveling around the loop, connecting bet -> bet -> more users */}
+        <div
+          className="absolute z-20 h-3.5 w-3.5 rounded-full bg-amber-400 shadow-[0_0_12px_3px_rgba(251,191,36,0.65)]"
+          style={{ left: dotX - 7, top: dotY - 7 }}
+        />
       </div>
 
       <div className="flex items-center gap-3 text-[13px] font-semibold text-gray-400">
-        <span>Understand</span>
+        <span className={activeIndex === 0 ? "text-gray-900" : undefined}>Understand</span>
         <span>→</span>
-        <span>Trust</span>
+        <span className={activeIndex === 1 ? "text-gray-900" : undefined}>Trust</span>
         <span>→</span>
-        <span>Participate</span>
+        <span className={activeIndex === 2 ? "text-gray-900" : undefined}>Participate</span>
         <span>→</span>
-        <span>Distribute</span>
+        <span className={activeIndex === 3 ? "text-gray-900" : undefined}>Distribute</span>
         <span>→</span>
         <span className="text-gray-800">back into the network</span>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => setRunning((v) => !v)}
+          className="flex items-center gap-1.5 rounded-full border border-gray-200 px-3 py-1.5 text-[12px] font-semibold text-gray-600 hover:border-gray-300 hover:text-gray-900"
+        >
+          {running ? <Pause size={12} /> : <Play size={12} />}
+          {running ? "Pause loop" : "Resume loop"}
+        </button>
+        <div className="flex items-center gap-2 rounded-full bg-gray-50 px-3 py-1.5 text-[12px] font-semibold text-gray-600">
+          <span>{loopsCompleted}</span> loops compounded
+        </div>
+        <div className="flex items-center gap-2 rounded-full bg-gray-900 px-3 py-1.5 text-[12px] font-bold text-white">
+          Simulated MAP: {mapMultiplier.toFixed(1)}x
+        </div>
       </div>
 
       <div className="rounded-full bg-gray-900 px-5 py-2.5 text-[13px] font-extrabold tracking-wide text-white">
@@ -75,10 +138,12 @@ export function VisionView() {
       </div>
       <div className="max-w-md text-center text-[12px] text-gray-400">
         Monthly Active Participants: unique wallets or accounts that place a funded trade or take a qualified
-        intelligence action — a query, follow, or embed click-through. This is a target, not an achieved result.
+        intelligence action — a query, follow, or embed click-through. This is a target, not an achieved result. The
+        loop and multiplier above are an illustrative simulation, not measured data.
       </div>
 
       <PresentationBar />
     </div>
   );
 }
+

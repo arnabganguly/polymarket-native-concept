@@ -141,6 +141,31 @@ export interface AskPrompt {
   links: ExternalLink[];
 }
 
+export type Audience = "trader" | "journalist" | "institution";
+
+export const audienceFraming: Record<
+  Audience,
+  { label: string; tagline: string; emphasize: "why" | "next" | "ask" }
+> = {
+  trader: {
+    label: "Trader",
+    tagline: "Fast, actionable context on what's moving this market and what could move it next.",
+    emphasize: "next",
+  },
+  journalist: {
+    label: "Journalist",
+    tagline:
+      "Neutral, sourced summaries with links to primary coverage — built for verification, not for quoting the summary itself.",
+    emphasize: "why",
+  },
+  institution: {
+    label: "Institution / Risk Team",
+    tagline:
+      "Structural context to pair with the Trust score — what's driving the price, and how defensible that signal is.",
+    emphasize: "ask",
+  },
+};
+
 export const askThisMarketPrompts: AskPrompt[] = [
   {
     question: "Why did this probability rise?",

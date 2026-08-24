@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Zap, ShieldAlert, BellRing } from "lucide-react";
 import { automationCapabilities, fundingMethods, oneClickSteps, sampleAlert } from "@/lib/participate";
 import { InfoTooltip } from "@/components/info-tooltip";
+import { MapImpactChip } from "@/components/map-impact-chip";
 import { pillars } from "@/lib/pillars";
 
 export function ParticipatePanel() {
@@ -21,6 +22,8 @@ export function ParticipatePanel() {
         <Zap size={14} />
         PARTICIPATE · {p.concept.toUpperCase()}
       </div>
+
+      <MapImpactChip accent={p.accent} driver={p.mapDriver} impact={p.mapImpact} />
 
       <div className="grid gap-4 md:grid-cols-2">
         {/* SUB SECTION A: One-Click Access */}

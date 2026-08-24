@@ -1,13 +1,25 @@
 "use client";
 
-import { Radio } from "lucide-react";
-import { distributionChannels, enhancedApiResponse, todayApiResponse } from "@/lib/distribute";
+import { useState } from "react";
+import { Bot, Radio, Send } from "lucide-react";
+import {
+  aiAgentApiCall,
+  aiAgentQuery,
+  aiAgentResponse,
+  aiAgentSummary,
+  distributionChannels,
+  enhancedApiResponse,
+  todayApiResponse,
+} from "@/lib/distribute";
 import { InfoTooltip } from "@/components/info-tooltip";
+import { MapImpactChip } from "@/components/map-impact-chip";
 import { pillars } from "@/lib/pillars";
 import { selectedOutcome } from "@/lib/market";
 
 export function DistributePanel() {
   const p = pillars.distribute;
+  const [agentAsked, setAgentAsked] = useState(false);
+
   return (
     <section
       id="section-distribute"
@@ -18,6 +30,8 @@ export function DistributePanel() {
         <Radio size={14} />
         DISTRIBUTE · {p.concept.toUpperCase()}
       </div>
+
+      <MapImpactChip accent={p.accent} driver={p.mapDriver} impact={p.mapImpact} />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="rounded-lg border bg-white/70 p-3.5" style={{ borderColor: p.border }}>
@@ -77,6 +91,66 @@ export function DistributePanel() {
                 <div className="text-[10px] text-gray-400">{c.note}</div>
               </div>
             ))}
+          </div>
+        </div>
+
+        <div className="rounded-lg border bg-white/70 p-3.5 lg:col-span-2" style={{ borderColor: p.border }}>
+          <div className="mb-2 flex items-center gap-1.5 text-[12px] font-bold text-gray-900">
+            <Bot size={14} style={{ color: p.accent }} />
+            AI agent demo
+            <InfoTooltip
+              accent={p.accent}
+              text="A third-party AI agent (e.g. a research or portfolio assistant) calls the conceptual intelligence API and grounds its answer in the structured payload — probability, confidence, drivers — instead of guessing."
+            />
+          </div>
+
+          <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-2">
+                <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-900 text-white">
+                  <Bot size={12} />
+                </div>
+                <div>
+                  <div className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
+                    Third-party research agent
+                  </div>
+                  <p className="mt-0.5 text-[12.5px] text-gray-700">{aiAgentQuery}</p>
+                </div>
+              </div>
+              {!agentAsked && (
+                <button
+                  onClick={() => setAgentAsked(true)}
+                  className="flex shrink-0 items-center gap-1 rounded-full px-3 py-1.5 text-[11px] font-bold text-white"
+                  style={{ background: p.accent }}
+                >
+                  <Send size={11} /> Run query
+                </button>
+              )}
+            </div>
+
+            {agentAsked && (
+              <div className="mt-3 border-t border-gray-100 pt-3">
+                <div className="mb-1 text-[10px] font-bold uppercase tracking-wide text-gray-400">
+                  Agent calls intelligence API
+                </div>
+                <pre className="whitespace-pre-wrap rounded-md bg-gray-900 p-2.5 text-[10.5px] leading-relaxed text-emerald-300">
+                  {aiAgentApiCall}
+                  {"\n\n"}
+                  {JSON.stringify(aiAgentResponse, null, 2)}
+                </pre>
+                <div className="mt-2.5 flex items-start gap-2">
+                  <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#1652F0]/10 text-[#1652F0]">
+                    <Bot size={12} />
+                  </div>
+                  <div>
+                    <div className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
+                      Agent's grounded answer
+                    </div>
+                    <p className="mt-0.5 text-[12.5px] leading-relaxed text-gray-700">{aiAgentSummary}</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

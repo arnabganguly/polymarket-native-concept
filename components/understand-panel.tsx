@@ -4,11 +4,14 @@ import { useState } from "react";
 import { Sparkles, Send, Newspaper, X as XIcon, ExternalLink } from "lucide-react";
 import {
   askThisMarketPrompts,
+  audienceFraming,
   upcomingCatalysts,
   whyItMoved,
+  type Audience,
   type ExternalLink as ExternalLinkType,
 } from "@/lib/intelligence";
 import { InfoTooltip } from "@/components/info-tooltip";
+import { MapImpactChip } from "@/components/map-impact-chip";
 import { pillars } from "@/lib/pillars";
 
 type Tab = "why" | "next" | "ask";
@@ -37,7 +40,8 @@ function LinkRow({ links, accent }: { links: ExternalLinkType[]; accent: string 
 
 export function UnderstandPanel() {
   const p = pillars.understand;
-  const [tab, setTab] = useState<Tab>("why");
+  const [audience, setAudience] = useState<Audience>("trader");
+  const [tab, setTab] = useState<Tab>(audienceFraming.trader.emphasize);
   const [answerIdx, setAnswerIdx] = useState<number | null>(null);
   const [openCatalyst, setOpenCatalyst] = useState<string | null>(null);
 
@@ -56,6 +60,30 @@ export function UnderstandPanel() {
             text="Lightweight context about what may be moving this market and what could move it next, plus real links out to social and news coverage so you can dig further. Not investment advice, and not a prediction."
           />
         </div>
+      </div>
+
+      <MapImpactChip accent={p.accent} driver={p.mapDriver} impact={p.mapImpact} />
+
+      <div className="mb-3">
+        <div className="mb-1.5 text-[10.5px] font-bold tracking-wide text-gray-400">VIEWING AS</div>
+        <div className="flex flex-wrap gap-1.5">
+          {(Object.keys(audienceFraming) as Audience[]).map((a) => (
+            <button
+              key={a}
+              onClick={() => {
+                setAudience(a);
+                setTab(audienceFraming[a].emphasize);
+              }}
+              className={`rounded-full border px-2.5 py-1 text-[11.5px] font-bold transition-colors ${
+                audience === a ? "text-white" : "bg-white/70 text-gray-500 hover:border-gray-300"
+              }`}
+              style={audience === a ? { background: p.accent, borderColor: p.accent } : { borderColor: p.border }}
+            >
+              {audienceFraming[a].label}
+            </button>
+          ))}
+        </div>
+        <p className="mt-1.5 text-[11.5px] leading-snug text-gray-500">{audienceFraming[audience].tagline}</p>
       </div>
 
       <div className="mb-3 flex gap-1 text-[12px] font-bold text-gray-500">
