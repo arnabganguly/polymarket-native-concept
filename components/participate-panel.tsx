@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Zap, ShieldAlert, BellRing } from "lucide-react";
-import { automationCapabilities, fundingMethods, oneClickSteps, sampleAlert } from "@/lib/participate";
+import { automationCapabilities, fundingMethods, fundingSteps, sampleAlert } from "@/lib/participate";
 import { InfoTooltip } from "@/components/info-tooltip";
 import { MapImpactChip } from "@/components/map-impact-chip";
 import { pillars } from "@/lib/pillars";
@@ -26,20 +26,20 @@ export function ParticipatePanel() {
       <MapImpactChip accent={p.accent} driver={p.mapDriver} impact={p.mapImpact} />
 
       <div className="grid gap-4 md:grid-cols-2">
-        {/* SUB SECTION A: One-Click Access */}
+        {/* SUB SECTION A: Seamless Funding */}
         <div className="rounded-lg border bg-white/70 p-3.5" style={{ borderColor: p.border }}>
           <div className="mb-2 flex items-center gap-1.5 text-[12.5px] font-bold text-gray-900">
-            One-Click Access
+            Seamless Funding
             <InfoTooltip
               accent={p.accent}
-              text="A simplified path from understanding a market to acting on it: choose an outcome, choose an amount, pick a funding method, done. Reduces friction, not investment risk."
+              text="From fiat-adjacent to fiat-native: choose an outcome, choose an amount, pick a funding method, done. Reduces friction, not investment risk."
             />
           </div>
           <div className="mb-3 flex items-center gap-1 text-[10.5px] font-semibold text-gray-400">
-            {oneClickSteps.map((s, i) => (
+            {fundingSteps.map((s, i) => (
               <span key={s} className="flex items-center gap-1">
                 <span className="rounded-full bg-gray-100 px-2 py-0.5 text-gray-600">{s}</span>
-                {i < oneClickSteps.length - 1 && <span>→</span>}
+                {i < fundingSteps.length - 1 && <span>→</span>}
               </span>
             ))}
           </div>

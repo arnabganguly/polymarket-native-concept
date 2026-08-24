@@ -1,4 +1,4 @@
-// PARTICIPATE — One-Click Access + Better Trading Automation
+// PARTICIPATE — Seamless Funding + Better Trading Automation
 
 export const fundingMethods = [
   { id: "apple-pay", label: "Apple Pay" },
@@ -6,7 +6,7 @@ export const fundingMethods = [
   { id: "usdc", label: "USDC" },
 ];
 
-export const oneClickSteps = [
+export const fundingSteps = [
   "Choose outcome",
   "Choose amount",
   "Funding method",

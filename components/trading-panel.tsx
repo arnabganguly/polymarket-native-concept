@@ -173,14 +173,14 @@ export function TradingPanel() {
       {mode === "enhanced" && (
         <div className="rounded-lg border p-3" style={{ background: "#F1F7FF", borderColor: "#D7E9FF" }}>
           <div className="flex items-center gap-1.5 text-[11px] font-bold" style={{ color: "#1652F0" }}>
-            POLYMARKET+ · ONE-CLICK ACCESS
+            POLYMARKET+ · SEAMLESS FUNDING
             <InfoTooltip
               accent="#1652F0"
-              text="A simplified buy flow — choose outcome, amount, funding method, done. Reduces friction between understanding a market and acting on it."
+              text="From fiat-adjacent to fiat-native: choose outcome, amount, funding method, done. Reduces friction between understanding a market and acting on it."
             />
           </div>
           <div className="mt-1 text-[12px] text-gray-600">
-            Skip the form. Buy with Apple Pay, Debit, or USDC in one tap.
+            Skip the wallet setup. Fund with Apple Pay, Debit, or Bank in seconds.
           </div>
         </div>
       )}
