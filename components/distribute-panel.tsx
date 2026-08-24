@@ -1,12 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Bot, ChevronDown, Radio, Send, Sparkles } from "lucide-react";
+import { Bot, ChevronDown, Radio, RotateCcw, Send, Sparkles } from "lucide-react";
 import {
-  aiAgentApiCall,
-  aiAgentQuery,
-  aiAgentResponse,
-  aiAgentSummary,
+  aiAgentScenarios,
   distributionChannels,
   enhancedApiResponse,
   todayApiResponse,
@@ -20,12 +17,27 @@ type AgentPhase = "idle" | "thinking" | "answered";
 
 export function DistributePanel() {
   const p = pillars.distribute;
+  const [scenarioId, setScenarioId] = useState(aiAgentScenarios[0].id);
   const [phase, setPhase] = useState<AgentPhase>("idle");
   const [showRaw, setShowRaw] = useState(false);
+
+  const scenario = aiAgentScenarios.find((s) => s.id === scenarioId)!;
 
   const runQuery = () => {
     setPhase("thinking");
     setTimeout(() => setPhase("answered"), 900);
+  };
+
+  const selectScenario = (id: string) => {
+    setScenarioId(id);
+    setShowRaw(false);
+    setPhase("idle");
+  };
+
+  const replay = () => {
+    setShowRaw(false);
+    setPhase("idle");
+    setTimeout(runQuery, 50);
   };
 
   return (
@@ -136,9 +148,32 @@ export function DistributePanel() {
           </div>
 
           <div className="flex flex-col gap-2.5">
+            {/* question picker — same API, four different agent intents */}
+            <div className="flex flex-wrap gap-1.5">
+              {aiAgentScenarios.map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => selectScenario(s.id)}
+                  className={`rounded-full border px-2.5 py-1 text-[10.5px] font-semibold transition-colors ${
+                    scenarioId === s.id ? "text-white" : "bg-white text-gray-500 hover:border-gray-300"
+                  }`}
+                  style={
+                    scenarioId === s.id
+                      ? { background: p.accent, borderColor: p.accent }
+                      : { borderColor: p.border }
+                  }
+                >
+                  {s.query.length > 38 ? s.query.slice(0, 36) + "…" : s.query}
+                </button>
+              ))}
+            </div>
+
             {/* user turn */}
-            <div className="ml-auto max-w-[90%] rounded-2xl rounded-tr-sm bg-gray-900 px-3 py-2 text-[12.5px] text-white shadow-sm">
-              {aiAgentQuery}
+            <div className="flex flex-col items-end gap-1 self-end">
+              <span className="text-[10px] font-semibold text-gray-400">{scenario.askedBy}</span>
+              <div className="max-w-[90%] rounded-2xl rounded-tr-sm bg-gray-900 px-3 py-2 text-[12.5px] text-white shadow-sm">
+                {scenario.query}
+              </div>
             </div>
 
             {phase === "idle" && (
@@ -171,31 +206,40 @@ export function DistributePanel() {
                     <Bot size={12} />
                   </div>
                   <div className="max-w-[92%] rounded-2xl rounded-tl-sm border border-gray-200 bg-white px-3 py-2 text-[12.5px] leading-relaxed text-gray-700 shadow-sm">
-                    {aiAgentSummary}
+                    {scenario.summary}
                   </div>
                 </div>
 
                 {/* grounding chips — same fields as the API card, shown as evidence not a JSON dump */}
                 <div className="ml-8 flex flex-wrap gap-1.5">
-                  <GroundingChip label={`${Math.round(aiAgentResponse.probability * 100)}% probability`} accent={p.accent} />
-                  <GroundingChip label={aiAgentResponse.change} accent={p.accent} />
-                  <GroundingChip label={aiAgentResponse.signal_quality} accent={p.accent} />
-                  <GroundingChip label={`Next: ${aiAgentResponse.next_catalyst}`} accent={p.accent} />
+                  <GroundingChip label={`${Math.round(scenario.response.probability * 100)}% probability`} accent={p.accent} />
+                  <GroundingChip label={scenario.response.change} accent={p.accent} />
+                  <GroundingChip label={scenario.response.signal_quality} accent={p.accent} />
+                  <GroundingChip label={`Next: ${scenario.response.next_catalyst}`} accent={p.accent} />
                 </div>
 
-                <button
-                  onClick={() => setShowRaw((v) => !v)}
-                  className="ml-8 flex items-center gap-1 self-start text-[10.5px] font-semibold text-gray-400 hover:text-gray-600"
-                >
-                  <ChevronDown size={12} className={`transition-transform ${showRaw ? "rotate-180" : ""}`} />
-                  {showRaw ? "Hide" : "View"} the raw API call behind this answer
-                </button>
+                <div className="ml-8 flex items-center gap-3">
+                  <button
+                    onClick={() => setShowRaw((v) => !v)}
+                    className="flex items-center gap-1 text-[10.5px] font-semibold text-gray-400 hover:text-gray-600"
+                  >
+                    <ChevronDown size={12} className={`transition-transform ${showRaw ? "rotate-180" : ""}`} />
+                    {showRaw ? "Hide" : "View"} the raw API call behind this answer
+                  </button>
+                  <button
+                    onClick={replay}
+                    className="flex items-center gap-1 rounded-full border px-2.5 py-1 text-[10.5px] font-bold text-gray-600 hover:border-gray-300"
+                    style={{ borderColor: p.border }}
+                  >
+                    <RotateCcw size={11} /> Replay
+                  </button>
+                </div>
 
                 {showRaw && (
                   <pre className="ml-8 whitespace-pre-wrap rounded-md bg-gray-900 p-2.5 text-[10px] leading-relaxed text-emerald-300">
-                    {aiAgentApiCall}
+                    {scenario.apiCall}
                     {"\n\n"}
-                    {JSON.stringify(aiAgentResponse, null, 2)}
+                    {JSON.stringify(scenario.response, null, 2)}
                   </pre>
                 )}
 
