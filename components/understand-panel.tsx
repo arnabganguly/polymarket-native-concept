@@ -1,17 +1,45 @@
 "use client";
 
 import { useState } from "react";
-import { Sparkles, Send } from "lucide-react";
-import { askThisMarketPrompts, upcomingCatalysts, whyItMoved } from "@/lib/intelligence";
+import { Sparkles, Send, Newspaper, X as XIcon, ExternalLink } from "lucide-react";
+import {
+  askThisMarketPrompts,
+  upcomingCatalysts,
+  whyItMoved,
+  type ExternalLink as ExternalLinkType,
+} from "@/lib/intelligence";
 import { InfoTooltip } from "@/components/info-tooltip";
 import { pillars } from "@/lib/pillars";
 
 type Tab = "why" | "next" | "ask";
 
+function LinkRow({ links, accent }: { links: ExternalLinkType[]; accent: string }) {
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {links.map((l) => (
+        <a
+          key={l.platform}
+          href={l.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          title={l.label}
+          className="flex items-center gap-1.5 rounded-full border bg-white px-2.5 py-1 text-[11px] font-semibold text-gray-600 hover:border-gray-300 hover:text-gray-900"
+          style={{ borderColor: accent + "33" }}
+        >
+          {l.platform === "Twitter/X" ? <XIcon size={11} /> : <Newspaper size={11} />}
+          {l.platform}
+          <ExternalLink size={10} className="text-gray-300" />
+        </a>
+      ))}
+    </div>
+  );
+}
+
 export function UnderstandPanel() {
   const p = pillars.understand;
   const [tab, setTab] = useState<Tab>("why");
-  const [answer, setAnswer] = useState<string | null>(null);
+  const [answerIdx, setAnswerIdx] = useState<number | null>(null);
+  const [openCatalyst, setOpenCatalyst] = useState<string | null>(null);
 
   return (
     <section
@@ -25,7 +53,7 @@ export function UnderstandPanel() {
           UNDERSTAND · {p.concept.toUpperCase()}
           <InfoTooltip
             accent={p.accent}
-            text="Lightweight context about what may be moving this market and what could move it next. Not investment advice, and not a prediction."
+            text="Lightweight context about what may be moving this market and what could move it next, plus real links out to social and news coverage so you can dig further. Not investment advice, and not a prediction."
           />
         </div>
       </div>
@@ -52,31 +80,88 @@ export function UnderstandPanel() {
       </div>
 
       {tab === "why" && (
-        <div className="rounded-lg bg-white/70 p-3 text-[13px] text-gray-700">
-          <span className="font-semibold text-gray-900">{whyItMoved.headline}</span>
-          <p className="mt-1 text-gray-600">{whyItMoved.detail}</p>
+        <div className="flex flex-col gap-3">
+          <div className="rounded-lg bg-white/70 p-3 text-[13px] text-gray-700">
+            <span className="font-semibold text-gray-900">{whyItMoved.headline}</span>
+            <p className="mt-1 text-gray-600">{whyItMoved.detail}</p>
+          </div>
+
+          <div className="rounded-lg bg-white/70 p-3">
+            <div className="mb-1.5 text-[11px] font-bold tracking-wide text-gray-400">WHAT PEOPLE ARE SAYING</div>
+            <ul className="flex flex-col gap-1.5">
+              {whyItMoved.commentary.map((c) => (
+                <li key={c} className="flex gap-1.5 text-[12.5px] text-gray-600">
+                  <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-gray-300" />
+                  {c}
+                </li>
+              ))}
+            </ul>
+            <div className="mt-2.5 text-[10.5px] text-gray-400">
+              Summaries only — nothing here is a direct quote. Explore the sources yourself:
+            </div>
+            <div className="mt-1.5">
+              <LinkRow links={whyItMoved.links} accent={p.accent} />
+            </div>
+          </div>
         </div>
       )}
 
       {tab === "next" && (
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          {upcomingCatalysts.map((c) => (
-            <div key={c.label} className="rounded-lg bg-white/70 p-2.5">
-              <div className="text-[11px] font-semibold text-gray-400">{c.date}</div>
-              <div className="text-[12.5px] font-bold text-gray-900">{c.label}</div>
-              <div className="text-[11px] text-gray-500">{c.note}</div>
+        <div className="flex flex-col gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {upcomingCatalysts.map((c) => {
+              const isOpen = openCatalyst === c.label;
+              return (
+                <button
+                  key={c.label}
+                  onClick={() => setOpenCatalyst(isOpen ? null : c.label)}
+                  className={`rounded-lg bg-white/70 p-2.5 text-left transition-colors ${
+                    isOpen ? "ring-1" : "hover:bg-white"
+                  }`}
+                  style={isOpen ? { boxShadow: `0 0 0 1px ${p.accent}` } : undefined}
+                >
+                  <div className="text-[11px] font-semibold text-gray-400">{c.date}</div>
+                  <div className="text-[12.5px] font-bold text-gray-900">{c.label}</div>
+                  <div className="text-[11px] text-gray-500">{c.note}</div>
+                </button>
+              );
+            })}
+          </div>
+
+          {openCatalyst && (
+            <div className="rounded-lg bg-white/70 p-3">
+              {(() => {
+                const c = upcomingCatalysts.find((x) => x.label === openCatalyst)!;
+                return (
+                  <>
+                    <div className="text-[11px] font-bold tracking-wide text-gray-400">
+                      {c.date.toUpperCase()} · WHAT TO WATCH
+                    </div>
+                    <p className="mt-1 text-[12.5px] text-gray-700">{c.whatToWatch}</p>
+                    <div className="mt-2.5 text-[10.5px] text-gray-400">
+                      Research ahead of the date — commentary here is speculative, not scheduled fact:
+                    </div>
+                    <div className="mt-1.5">
+                      <LinkRow links={c.links} accent={p.accent} />
+                    </div>
+                  </>
+                );
+              })()}
             </div>
-          ))}
+          )}
+          {!openCatalyst && (
+            <div className="px-0.5 text-[11px] text-gray-400">Tap a date above to see what to watch for and research it further.</div>
+          )}
         </div>
       )}
 
       {tab === "ask" && (
         <div className="flex flex-col gap-2">
           <div className="flex flex-wrap gap-1.5">
-            {askThisMarketPrompts.map((pr) => (
+            {askThisMarketPrompts.map((pr, i) => (
               <button
                 key={pr.question}
-                onClick={() => setAnswer(pr.answer)}
+                onClick={() => setAnswerIdx(i)}
                 className="rounded-full border bg-white px-2.5 py-1 text-[11.5px] font-medium text-gray-600 hover:border-gray-300"
                 style={{ borderColor: p.border }}
               >
@@ -92,8 +177,14 @@ export function UnderstandPanel() {
             />
             <Send size={14} className="text-gray-400" />
           </div>
-          {answer && (
-            <div className="rounded-lg bg-white/70 p-3 text-[13px] text-gray-700">{answer}</div>
+          {answerIdx !== null && (
+            <div className="rounded-lg bg-white/70 p-3">
+              <p className="text-[13px] text-gray-700">{askThisMarketPrompts[answerIdx].answer}</p>
+              <div className="mt-2.5 text-[10.5px] text-gray-400">Go deeper:</div>
+              <div className="mt-1.5">
+                <LinkRow links={askThisMarketPrompts[answerIdx].links} accent={p.accent} />
+              </div>
+            </div>
           )}
         </div>
       )}

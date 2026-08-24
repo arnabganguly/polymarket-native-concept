@@ -1,5 +1,25 @@
 // UNDERSTAND — Market Intelligence (proposed)
-// Lightweight, integrated context. Never claims to predict the outcome.
+// Lightweight, integrated context aimed at a curious, non-trading reader
+// (e.g. a journalist researching the market) as much as a trader. Never
+// claims to predict the outcome, and never fabricates quotes or headlines
+// attributed to real people or publications — external links point to live
+// search results on real platforms so readers can verify coverage
+// themselves rather than trusting a paraphrase.
+
+export interface ExternalLink {
+  platform: "Twitter/X" | "Financial Times" | "Bloomberg" | "Reuters" | "Google News";
+  label: string;
+  url: string;
+}
+
+function externalLinks(query: string): ExternalLink[] {
+  const q = encodeURIComponent(query);
+  return [
+    { platform: "Twitter/X", label: "See live discussion", url: `https://twitter.com/search?q=${q}&f=live` },
+    { platform: "Google News", label: "Browse recent coverage", url: `https://news.google.com/search?q=${q}` },
+    { platform: "Financial Times", label: "Search FT reporting", url: `https://www.ft.com/search?q=${q}` },
+  ];
+}
 
 // Chart-native market events. Each event ties a real-world happening to a
 // specific point on the probability chart (matched by date to a point in
@@ -15,6 +35,7 @@ export interface MarketEvent {
   toProbability: number;
   whyItMattered: string;
   source: string;
+  links: ExternalLink[];
 }
 
 export const marketEvents: MarketEvent[] = [
@@ -29,6 +50,7 @@ export const marketEvents: MarketEvent[] = [
     whyItMattered:
       "Traders reacted as cooler inflation strengthened the case for a near-term rate cut.",
     source: "Bureau of Labor Statistics",
+    links: externalLinks("August CPI report Fed rate cut reaction"),
   },
   {
     id: "fed-comments",
@@ -41,6 +63,7 @@ export const marketEvents: MarketEvent[] = [
     whyItMattered:
       "Market moved following language read as more dovish than prior guidance.",
     source: "Federal Reserve remarks",
+    links: externalLinks("Fed Chair speech dovish rate cut signal"),
   },
   {
     id: "jobs-revision",
@@ -53,25 +76,69 @@ export const marketEvents: MarketEvent[] = [
     whyItMattered:
       "Movement coincided with growing bets that the Fed would prioritize employment over inflation risk.",
     source: "Bureau of Labor Statistics",
+    links: externalLinks("payrolls revised lower labor market Fed"),
   },
 ];
 
 export const whyItMoved = {
   headline: "Weaker employment data increased expectations of a 25 bps cut.",
   detail:
-    "Payrolls came in below forecast on Aug 21, and traders shifted probability away from \u201cno change\u201d toward a 25 bps cut over the following two sessions.",
+    "Payrolls came in below forecast on Aug 21, and traders shifted probability away from \u201cno change\u201d toward a 25 bps cut over the following two sessions. The CPI print on Aug 12 and Fed Chair remarks on Aug 18 set up the move; see the markers on the chart above for a point-by-point breakdown.",
+  // Neutral, unattributed summaries of the kind of discussion happening
+  // around this market — not quotes, not attributed to specific people.
+  commentary: [
+    "Social discussion has centered on whether cooler inflation locks in a cut at the next meeting.",
+    "Financial press coverage has focused on how the Fed is weighing labor-market weakness against inflation risk.",
+    "Some commentators note the market may already be pricing in more easing than the Fed has committed to.",
+  ],
+  links: externalLinks("Fed rate cut probability September meeting"),
 };
 
-export const upcomingCatalysts = [
-  { label: "CPI release", date: "Sep 10", note: "Inflation print" },
-  { label: "Jobs report", date: "Sep 5", note: "Labor market read" },
-  { label: "Fed commentary", date: "Sep 12", note: "Scheduled remarks" },
-  { label: "FOMC meeting", date: "Sep 17", note: "Rate decision" },
+export interface Catalyst {
+  label: string;
+  date: string;
+  note: string;
+  whatToWatch: string;
+  links: ExternalLink[];
+}
+
+export const upcomingCatalysts: Catalyst[] = [
+  {
+    label: "CPI release",
+    date: "Sep 10",
+    note: "Inflation print",
+    whatToWatch:
+      "A hotter print would undercut the case for a cut; a cooler one would likely reinforce it further.",
+    links: externalLinks("September CPI report forecast Fed"),
+  },
+  {
+    label: "Jobs report",
+    date: "Sep 5",
+    note: "Labor market read",
+    whatToWatch:
+      "Another weak reading would add to the case for easing; a rebound could stall the recent move.",
+    links: externalLinks("September jobs report forecast labor market"),
+  },
+  {
+    label: "Fed commentary",
+    date: "Sep 12",
+    note: "Scheduled remarks",
+    whatToWatch: "Traders will parse tone for any shift toward or away from cutting.",
+    links: externalLinks("Federal Reserve commentary September rate outlook"),
+  },
+  {
+    label: "FOMC meeting",
+    date: "Sep 17",
+    note: "Rate decision",
+    whatToWatch: "The scheduled decision this market is ultimately pricing.",
+    links: externalLinks("FOMC meeting September rate decision"),
+  },
 ];
 
 export interface AskPrompt {
   question: string;
   answer: string;
+  links: ExternalLink[];
 }
 
 export const askThisMarketPrompts: AskPrompt[] = [
@@ -79,15 +146,18 @@ export const askThisMarketPrompts: AskPrompt[] = [
     question: "Why did this probability rise?",
     answer:
       "Weaker-than-expected employment data increased expectations of a 25 bps cut, pushing this outcome from 44% to 57% over three sessions.",
+    links: externalLinks("Fed rate cut probability rise employment data"),
   },
   {
     question: "What could change this market next?",
     answer:
       "The CPI release (Sep 10) and jobs report (Sep 5) are the next scheduled events most likely to move this market before the FOMC meeting.",
+    links: externalLinks("September CPI jobs report Fed meeting schedule"),
   },
   {
     question: "What would make this outcome less likely?",
     answer:
       "A hotter-than-expected inflation print or hawkish Fed commentary would reduce the case for a cut and could shift probability back toward \u201cno change.\u201d",
+    links: externalLinks("hawkish Fed commentary inflation rate cut odds"),
   },
 ];

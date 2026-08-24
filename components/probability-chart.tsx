@@ -182,6 +182,22 @@ export function ProbabilityChart() {
                 <p className="text-[12.5px] text-gray-600">{activeMarker.evt.whyItMattered}</p>
               </div>
 
+              <div className="mt-2 flex items-center gap-1.5">
+                {activeMarker.evt.links.map((l) => (
+                  <a
+                    key={l.platform}
+                    href={l.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={`${l.platform} \u2014 ${l.label}`}
+                    className="flex items-center gap-1 rounded-full bg-gray-50 px-2 py-1 text-[10.5px] font-semibold text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                  >
+                    {l.platform === "Twitter/X" ? <X size={10} /> : <Newspaper size={10} />}
+                    {l.platform}
+                  </a>
+                ))}
+              </div>
+
               <div className="mt-2.5 flex items-center justify-between border-t border-gray-100 pt-2">
                 <span className="text-[10.5px] text-gray-400">Source: {activeMarker.evt.source}</span>
                 <div className="flex items-center gap-1">
