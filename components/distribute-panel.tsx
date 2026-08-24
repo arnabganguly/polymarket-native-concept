@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bot, Radio, Send } from "lucide-react";
+import { Bot, ChevronDown, Radio, Send, Sparkles } from "lucide-react";
 import {
   aiAgentApiCall,
   aiAgentQuery,
@@ -16,9 +16,17 @@ import { MapImpactChip } from "@/components/map-impact-chip";
 import { pillars } from "@/lib/pillars";
 import { selectedOutcome } from "@/lib/market";
 
+type AgentPhase = "idle" | "thinking" | "answered";
+
 export function DistributePanel() {
   const p = pillars.distribute;
-  const [agentAsked, setAgentAsked] = useState(false);
+  const [phase, setPhase] = useState<AgentPhase>("idle");
+  const [showRaw, setShowRaw] = useState(false);
+
+  const runQuery = () => {
+    setPhase("thinking");
+    setTimeout(() => setPhase("answered"), 900);
+  };
 
   return (
     <section
@@ -33,38 +41,54 @@ export function DistributePanel() {
 
       <MapImpactChip accent={p.accent} driver={p.mapDriver} impact={p.mapImpact} />
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-lg border bg-white/70 p-3.5" style={{ borderColor: p.border }}>
-          <div className="mb-2 flex items-center gap-1.5 text-[12px] font-bold text-gray-900">
-            API
-            <span className="rounded-full bg-gray-100 px-1.5 py-0.5 text-[9px] font-bold text-gray-500">
-              APIS EXIST TODAY
-            </span>
+      {/* SOURCE: the one API, extended with interpretive fields */}
+      <div className="rounded-lg border bg-white/70 p-3.5" style={{ borderColor: p.border }}>
+        <div className="mb-2 flex items-center gap-1.5 text-[12px] font-bold text-gray-900">
+          API
+          <span className="rounded-full bg-gray-100 px-1.5 py-0.5 text-[9px] font-bold text-gray-500">
+            APIS EXIST TODAY
+          </span>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-2">
+          <div>
+            <div className="mb-1 text-[10.5px] font-bold text-gray-400">TODAY</div>
+            <pre className="whitespace-pre-wrap rounded-md bg-gray-900 p-2.5 text-[10.5px] leading-relaxed text-gray-100">
+              {todayApiResponse}
+            </pre>
           </div>
-          <div className="grid gap-2 sm:grid-cols-2">
-            <div>
-              <div className="mb-1 text-[10.5px] font-bold text-gray-400">TODAY</div>
-              <pre className="whitespace-pre-wrap rounded-md bg-gray-900 p-2.5 text-[10.5px] leading-relaxed text-gray-100">
-                {todayApiResponse}
-              </pre>
+          <div>
+            <div className="mb-1 flex items-center gap-1 text-[10.5px] font-bold" style={{ color: p.accent }}>
+              CONCEPTUAL INTELLIGENCE API
+              <InfoTooltip
+                accent={p.accent}
+                text="A proposed extension of the existing market API that adds interpretive context — momentum, drivers, and signal quality — alongside the raw probability."
+              />
             </div>
-            <div>
-              <div className="mb-1 flex items-center gap-1 text-[10.5px] font-bold" style={{ color: p.accent }}>
-                CONCEPTUAL INTELLIGENCE API
-                <InfoTooltip
-                  accent={p.accent}
-                  text="A proposed extension of the existing market API that adds interpretive context — momentum, drivers, and signal quality — alongside the raw probability."
-                />
-              </div>
-              <pre className="whitespace-pre-wrap rounded-md bg-gray-900 p-2.5 text-[10.5px] leading-relaxed text-emerald-300">
-                {enhancedApiResponse}
-              </pre>
-            </div>
+            <pre className="whitespace-pre-wrap rounded-md bg-gray-900 p-2.5 text-[10.5px] leading-relaxed text-emerald-300">
+              {enhancedApiResponse}
+            </pre>
           </div>
         </div>
+      </div>
 
+      {/* CONNECTOR: makes explicit that both consumers below share one source */}
+      <div className="my-3 flex items-center gap-2 px-1">
+        <div className="h-px flex-1" style={{ background: p.border }} />
+        <span className="text-[10.5px] font-bold tracking-wide text-gray-400">
+          ONE API · TWO KINDS OF CONSUMERS
+        </span>
+        <div className="h-px flex-1" style={{ background: p.border }} />
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        {/* CONSUMER 1: humans, via a widget */}
         <div className="rounded-lg border bg-white/70 p-3.5" style={{ borderColor: p.border }}>
-          <div className="mb-2 text-[12px] font-bold text-gray-900">Embeddable widget preview</div>
+          <div className="mb-2 flex items-center gap-1.5 text-[12px] font-bold text-gray-900">
+            Embeddable widget
+            <span className="rounded-full bg-gray-100 px-1.5 py-0.5 text-[9px] font-bold text-gray-500">
+              FOR HUMANS
+            </span>
+          </div>
           <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm">
             <div className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-gray-400">
               Finance Daily · Markets Widget
@@ -94,66 +118,106 @@ export function DistributePanel() {
           </div>
         </div>
 
-        <div className="rounded-lg border bg-white/70 p-3.5 lg:col-span-2" style={{ borderColor: p.border }}>
+        {/* CONSUMER 2: AI agents, via structured reasoning, not a UI at all */}
+        <div
+          className="rounded-lg border p-3.5"
+          style={{ borderColor: p.accent + "44", background: "linear-gradient(180deg, #ffffff 0%, " + p.wash + " 100%)" }}
+        >
           <div className="mb-2 flex items-center gap-1.5 text-[12px] font-bold text-gray-900">
-            <Bot size={14} style={{ color: p.accent }} />
-            AI agent demo
+            <Sparkles size={13} style={{ color: p.accent }} />
+            AI agent
+            <span className="rounded-full px-1.5 py-0.5 text-[9px] font-bold text-white" style={{ background: p.accent }}>
+              FOR AGENTS
+            </span>
             <InfoTooltip
               accent={p.accent}
-              text="A third-party AI agent (e.g. a research or portfolio assistant) calls the conceptual intelligence API and grounds its answer in the structured payload — probability, confidence, drivers — instead of guessing."
+              text="No UI at all — a third-party agent calls the same intelligence API and reasons over the structured fields (confidence, drivers, catalyst) to write a grounded answer instead of guessing."
             />
           </div>
 
-          <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-start gap-2">
-                <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-900 text-white">
-                  <Bot size={12} />
-                </div>
-                <div>
-                  <div className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
-                    Third-party research agent
-                  </div>
-                  <p className="mt-0.5 text-[12.5px] text-gray-700">{aiAgentQuery}</p>
-                </div>
-              </div>
-              {!agentAsked && (
-                <button
-                  onClick={() => setAgentAsked(true)}
-                  className="flex shrink-0 items-center gap-1 rounded-full px-3 py-1.5 text-[11px] font-bold text-white"
-                  style={{ background: p.accent }}
-                >
-                  <Send size={11} /> Run query
-                </button>
-              )}
+          <div className="flex flex-col gap-2.5">
+            {/* user turn */}
+            <div className="ml-auto max-w-[90%] rounded-2xl rounded-tr-sm bg-gray-900 px-3 py-2 text-[12.5px] text-white shadow-sm">
+              {aiAgentQuery}
             </div>
 
-            {agentAsked && (
-              <div className="mt-3 border-t border-gray-100 pt-3">
-                <div className="mb-1 text-[10px] font-bold uppercase tracking-wide text-gray-400">
-                  Agent calls intelligence API
-                </div>
-                <pre className="whitespace-pre-wrap rounded-md bg-gray-900 p-2.5 text-[10.5px] leading-relaxed text-emerald-300">
-                  {aiAgentApiCall}
-                  {"\n\n"}
-                  {JSON.stringify(aiAgentResponse, null, 2)}
-                </pre>
-                <div className="mt-2.5 flex items-start gap-2">
-                  <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#1652F0]/10 text-[#1652F0]">
+            {phase === "idle" && (
+              <button
+                onClick={runQuery}
+                className="flex items-center gap-1.5 self-start rounded-full px-3 py-1.5 text-[11px] font-bold text-white shadow-sm"
+                style={{ background: p.accent }}
+              >
+                <Send size={11} /> Let the agent answer
+              </button>
+            )}
+
+            {phase === "thinking" && (
+              <div className="flex items-center gap-2 self-start rounded-2xl rounded-tl-sm border border-gray-200 bg-white px-3 py-2 text-[11.5px] text-gray-400 shadow-sm">
+                <Bot size={13} className="shrink-0" style={{ color: p.accent }} />
+                <span className="inline-flex gap-0.5">
+                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-gray-300 [animation-delay:0ms]" />
+                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-gray-300 [animation-delay:150ms]" />
+                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-gray-300 [animation-delay:300ms]" />
+                </span>
+                querying /intelligence/fed-rate-decision …
+              </div>
+            )}
+
+            {phase === "answered" && (
+              <>
+                {/* agent turn */}
+                <div className="flex items-start gap-2 self-start">
+                  <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-white" style={{ background: p.accent }}>
                     <Bot size={12} />
                   </div>
-                  <div>
-                    <div className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
-                      Agent's grounded answer
-                    </div>
-                    <p className="mt-0.5 text-[12.5px] leading-relaxed text-gray-700">{aiAgentSummary}</p>
+                  <div className="max-w-[92%] rounded-2xl rounded-tl-sm border border-gray-200 bg-white px-3 py-2 text-[12.5px] leading-relaxed text-gray-700 shadow-sm">
+                    {aiAgentSummary}
                   </div>
                 </div>
-              </div>
+
+                {/* grounding chips — same fields as the API card, shown as evidence not a JSON dump */}
+                <div className="ml-8 flex flex-wrap gap-1.5">
+                  <GroundingChip label={`${Math.round(aiAgentResponse.probability * 100)}% probability`} accent={p.accent} />
+                  <GroundingChip label={aiAgentResponse.change} accent={p.accent} />
+                  <GroundingChip label={aiAgentResponse.signal_quality} accent={p.accent} />
+                  <GroundingChip label={`Next: ${aiAgentResponse.next_catalyst}`} accent={p.accent} />
+                </div>
+
+                <button
+                  onClick={() => setShowRaw((v) => !v)}
+                  className="ml-8 flex items-center gap-1 self-start text-[10.5px] font-semibold text-gray-400 hover:text-gray-600"
+                >
+                  <ChevronDown size={12} className={`transition-transform ${showRaw ? "rotate-180" : ""}`} />
+                  {showRaw ? "Hide" : "View"} the raw API call behind this answer
+                </button>
+
+                {showRaw && (
+                  <pre className="ml-8 whitespace-pre-wrap rounded-md bg-gray-900 p-2.5 text-[10px] leading-relaxed text-emerald-300">
+                    {aiAgentApiCall}
+                    {"\n\n"}
+                    {JSON.stringify(aiAgentResponse, null, 2)}
+                  </pre>
+                )}
+
+                <div className="ml-8 text-[10.5px] italic text-gray-400">
+                  Same payload as the API card above — grounded, not generated.
+                </div>
+              </>
             )}
           </div>
         </div>
       </div>
     </section>
+  );
+}
+
+function GroundingChip({ label, accent }: { label: string; accent: string }) {
+  return (
+    <span
+      className="rounded-full border bg-white px-2 py-0.5 text-[10.5px] font-semibold text-gray-700"
+      style={{ borderColor: accent + "44" }}
+    >
+      {label}
+    </span>
   );
 }
