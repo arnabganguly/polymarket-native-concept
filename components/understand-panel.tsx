@@ -41,7 +41,10 @@ function LinkRow({ links, accent }: { links: ExternalLinkType[]; accent: string 
 export function UnderstandPanel() {
   const p = pillars.understand;
   const [audience, setAudience] = useState<Audience>("trader");
-  const [tab, setTab] = useState<Tab>(audienceFraming.trader.emphasize);
+  // Always land on "Why did this move?" — it's the most orienting answer for
+  // a first-time viewer. Switching audience below can still re-emphasize a
+  // different tab intentionally.
+  const [tab, setTab] = useState<Tab>("why");
   const [answerIdx, setAnswerIdx] = useState<number | null>(null);
   const [openCatalyst, setOpenCatalyst] = useState<string | null>(null);
 
