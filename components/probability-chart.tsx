@@ -4,8 +4,11 @@ import { useMemo, useState } from "react";
 import { Newspaper, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { probabilityHistory, selectedOutcome } from "@/lib/market";
 import { marketEvents } from "@/lib/intelligence";
+import { useExperience } from "@/lib/experience-context";
 
 export function ProbabilityChart() {
+  const { mode } = useExperience();
+  const enhanced = mode === "enhanced";
   const points = probabilityHistory;
   const w = 640;
   const h = 160;
@@ -29,15 +32,17 @@ export function ProbabilityChart() {
   type Marker = { evt: (typeof marketEvents)[number]; coord: { x: number; y: number } };
   const eventMarkers: Marker[] = useMemo(
     () =>
-      marketEvents
-        .map((evt) => {
-          const idx = points.findIndex((p) => p.t === evt.date);
-          if (idx === -1) return null;
-          return { evt, coord: coords[idx] };
-        })
-        .filter((m): m is Marker => m !== null),
+      enhanced
+        ? marketEvents
+            .map((evt) => {
+              const idx = points.findIndex((p) => p.t === evt.date);
+              if (idx === -1) return null;
+              return { evt, coord: coords[idx] };
+            })
+            .filter((m): m is Marker => m !== null)
+        : [],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [points]
+    [points, enhanced]
   );
 
   const activeMarker = eventMarkers.find((m) => m.evt.id === activeId) ?? null;
@@ -98,8 +103,9 @@ export function ProbabilityChart() {
           <path d={path} fill="none" stroke="#1652F0" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
           <circle cx={coords[coords.length - 1].x} cy={coords[coords.length - 1].y} r={4} fill="#1652F0" />
 
-          {/* Event markers */}
-          {eventMarkers.map(({ evt, coord }) => {
+          {/* Event markers (Polymarket+ only) */}
+          {enhanced &&
+            eventMarkers.map(({ evt, coord }) => {
             const isActive = evt.id === activeId;
             return (
               <g key={evt.id}>
@@ -144,7 +150,7 @@ export function ProbabilityChart() {
           })}
         </svg>
 
-        {activeMarker && (
+        {enhanced && activeMarker && (
           <div
             className="absolute top-full z-20 mt-2 w-[280px] -translate-x-1/2 transition-all duration-150"
             style={{ left: `${cardLeftPct}%` }}
@@ -206,10 +212,12 @@ export function ProbabilityChart() {
         <span>{points[points.length - 1].t}</span>
       </div>
 
-      <div className="mt-2 text-[11px] text-gray-400">
-        <Newspaper size={11} className="mr-1 inline -translate-y-px" />
-        Hover or tap the markers above for the events behind each move.
-      </div>
+      {enhanced && (
+        <div className="mt-2 text-[11px] text-gray-400">
+          <Newspaper size={11} className="mr-1 inline -translate-y-px" />
+          Hover or tap the markers above for the events behind each move.
+        </div>
+      )}
     </div>
   );
 }
