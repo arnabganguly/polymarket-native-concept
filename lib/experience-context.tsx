@@ -22,6 +22,8 @@ interface ExperienceContextValue {
   stopPresentation: () => void;
   nextStep: () => void;
   prevStep: () => void;
+  balance: number;
+  addFunds: (amount: number) => void;
 }
 
 const ExperienceContext = createContext<ExperienceContextValue | null>(null);
@@ -30,6 +32,11 @@ export function ExperienceProvider({ children }: { children: React.ReactNode }) 
   const [mode, setMode] = useState<ExperienceMode>("current");
   const [presenting, setPresenting] = useState(false);
   const [step, setStep] = useState(0);
+  const [balance, setBalance] = useState(1240.5);
+
+  const addFunds = useCallback((amount: number) => {
+    setBalance((prev) => +(prev + amount).toFixed(2));
+  }, []);
 
   const goToStep = useCallback((index: number) => {
     const s = presentationSteps[index];
@@ -79,8 +86,19 @@ export function ExperienceProvider({ children }: { children: React.ReactNode }) 
   }, [goToStep]);
 
   const value = useMemo(
-    () => ({ mode, setMode, presenting, step, startPresentation, stopPresentation, nextStep, prevStep }),
-    [mode, presenting, step, startPresentation, stopPresentation, nextStep, prevStep]
+    () => ({
+      mode,
+      setMode,
+      presenting,
+      step,
+      startPresentation,
+      stopPresentation,
+      nextStep,
+      prevStep,
+      balance,
+      addFunds,
+    }),
+    [mode, presenting, step, startPresentation, stopPresentation, nextStep, prevStep, balance, addFunds]
   );
 
   return <ExperienceContext.Provider value={value}>{children}</ExperienceContext.Provider>;

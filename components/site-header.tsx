@@ -1,10 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { Search, ChevronDown, Play } from "lucide-react";
 import { useExperience } from "@/lib/experience-context";
+import { DepositModal } from "@/components/deposit-modal";
 
 export function SiteHeader() {
-  const { mode, setMode, startPresentation, presenting } = useExperience();
+  const { mode, setMode, startPresentation, presenting, balance } = useExperience();
+  const [depositOpen, setDepositOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-40 border-b border-gray-200 bg-white">
@@ -65,9 +68,12 @@ export function SiteHeader() {
           </button>
 
           <div className="hidden items-center gap-2 rounded-full bg-gray-50 px-3 py-1.5 text-[13px] font-semibold text-gray-700 sm:flex">
-            $1,240.50
+            ${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
-          <button className="rounded-full bg-[#1652F0] px-4 py-1.5 text-[13px] font-semibold text-white hover:bg-[#1142cc]">
+          <button
+            onClick={() => setDepositOpen(true)}
+            className="rounded-full bg-[#1652F0] px-4 py-1.5 text-[13px] font-semibold text-white hover:bg-[#1142cc]"
+          >
             Deposit
           </button>
           <div className="h-8 w-8 rounded-full bg-gray-200" />
@@ -79,6 +85,8 @@ export function SiteHeader() {
           PRESENTATION MODE ACTIVE
         </div>
       )}
+
+      <DepositModal open={depositOpen} onClose={() => setDepositOpen(false)} />
     </header>
   );
 }

@@ -32,18 +32,20 @@ export const market = {
 
 // Probability history for the selected outcome (Cut rates by 25 bps),
 // used to draw the historical chart. Values are percentages 0-100.
+// Dates align with the market events in lib/intelligence.ts so chart
+// markers can be placed at exact points on the line.
 export const probabilityHistory: { t: string; p: number }[] = [
   { t: "Aug 1", p: 34 },
   { t: "Aug 4", p: 36 },
   { t: "Aug 7", p: 35 },
   { t: "Aug 10", p: 38 },
-  { t: "Aug 13", p: 41 },
-  { t: "Aug 16", p: 40 },
-  { t: "Aug 19", p: 43 },
-  { t: "Aug 20", p: 44 },
-  { t: "Aug 21", p: 49 }, // employment data release
-  { t: "Aug 22", p: 53 },
-  { t: "Aug 23", p: 55 },
+  { t: "Aug 12", p: 45 }, // CPI data released
+  { t: "Aug 14", p: 44 },
+  { t: "Aug 16", p: 46 },
+  { t: "Aug 18", p: 52 }, // Fed Chair comments
+  { t: "Aug 20", p: 51 },
+  { t: "Aug 21", p: 60 }, // Jobs data revised
+  { t: "Aug 22", p: 58 },
   { t: "Aug 24", p: 57 },
 ];
 
