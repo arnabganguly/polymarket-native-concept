@@ -36,7 +36,7 @@ export default function Home() {
 
             {enhanced && <UnderstandPanel />}
 
-            <CommentsPanel />
+            {!enhanced && <CommentsPanel />}
           </div>
 
           <div className="lg:sticky lg:top-20 lg:self-start">
