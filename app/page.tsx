@@ -32,9 +32,9 @@ export default function Home() {
 
             <OutcomesPanel />
 
-            {enhanced && <TrustCard />}
-
             {enhanced && <UnderstandPanel />}
+
+            {enhanced && <TrustCard />}
 
             {!enhanced && <CommentsPanel />}
           </div>
