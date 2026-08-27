@@ -23,27 +23,41 @@ export default function Home() {
       <SiteHeader />
 
       <main className="mx-auto w-full max-w-[1440px] flex-1 px-6 py-6">
-        <div id="section-market" className="grid gap-6 lg:grid-cols-[1fr_360px]">
-          <div className="flex flex-col gap-5">
+        {enhanced ? (
+          <div id="section-market" className="flex flex-col gap-5">
             <MarketHeader />
             <div className="rounded-xl border border-gray-200 p-4">
               <ProbabilityChart />
             </div>
 
-            {enhanced && <TrustCard />}
+            <div className="max-w-md">
+              <TradingPanel />
+            </div>
+
+            <TrustCard />
 
             <OutcomesPanel />
 
-            {enhanced && <UnderstandPanel />}
-
-            {!enhanced && <CommentsPanel />}
+            <UnderstandPanel />
           </div>
+        ) : (
+          <div id="section-market" className="grid gap-6 lg:grid-cols-[1fr_360px]">
+            <div className="flex flex-col gap-5">
+              <MarketHeader />
+              <div className="rounded-xl border border-gray-200 p-4">
+                <ProbabilityChart />
+              </div>
 
-          <div className="lg:sticky lg:top-20 lg:self-start">
-            <TradingPanel />
+              <OutcomesPanel />
+
+              <CommentsPanel />
+            </div>
+
+            <div className="lg:sticky lg:top-20 lg:self-start">
+              <TradingPanel />
+            </div>
           </div>
-        </div>
-
+        )}
         {enhanced && (
           <div className="mt-6 flex flex-col gap-6">
             <ParticipatePanel />
