@@ -126,14 +126,17 @@ export function UnderstandPanel() {
   }
 
   function selectAudience(a: Audience) {
-    // Switching persona mid-answer would otherwise show stale text under a
-    // new persona badge, so reset the ask flow along with the tab emphasis.
-    clearTimers();
-    setAskPhase("idle");
-    setAnswerIdx(null);
-    setDisplayedText("");
+    // Keep whatever tab and question the user already has open — switching
+    // persona should just re-render that same view with the new persona's
+    // answer, so it's easy to demo "same question, different persona".
     setAudience(a);
-    setTab(audienceFraming[a].emphasize);
+    if (answerIdx !== null) {
+      // Swap in the new persona's answer immediately rather than replaying
+      // the thinking/streaming animation, so the comparison feels instant.
+      clearTimers();
+      setAskPhase("done");
+      setDisplayedText(askThisMarketPrompts[answerIdx].answers[a].text);
+    }
   }
 
   return (
