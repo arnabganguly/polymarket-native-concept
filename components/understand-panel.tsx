@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Sparkles, Send, Newspaper, X as XIcon, ExternalLink } from "lucide-react";
 import {
   askThisMarketPrompts,
   audienceFraming,
+  thinkingPhrases,
   upcomingCatalysts,
   whyItMoved,
   type Audience,
@@ -15,6 +16,14 @@ import { MapImpactChip } from "@/components/map-impact-chip";
 import { pillars } from "@/lib/pillars";
 
 type Tab = "why" | "next" | "ask";
+type AskPhase = "idle" | "thinking" | "streaming" | "done";
+
+// Kept at module scope (not inside the component) so linting can verify
+// these impure calls never happen during render — only from the
+// askQuestion event handler.
+function randomBetween(min: number, max: number) {
+  return min + Math.random() * (max - min);
+}
 
 function LinkRow({ links, accent }: { links: ExternalLinkType[]; accent: string }) {
   return (
@@ -46,7 +55,54 @@ export function UnderstandPanel() {
   // different tab intentionally.
   const [tab, setTab] = useState<Tab>("why");
   const [answerIdx, setAnswerIdx] = useState<number | null>(null);
+  const [askPhase, setAskPhase] = useState<AskPhase>("idle");
+  const [displayedText, setDisplayedText] = useState("");
+  const [thinkingPhraseIdx, setThinkingPhraseIdx] = useState(0);
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const [openCatalyst, setOpenCatalyst] = useState<string | null>(null);
+
+  function clearTimers() {
+    timersRef.current.forEach(clearTimeout);
+    timersRef.current = [];
+  }
+
+  useEffect(() => clearTimers, []);
+
+  function askQuestion(i: number) {
+    clearTimers();
+    setAnswerIdx(i);
+    setAskPhase("thinking");
+    setDisplayedText("");
+    setThinkingPhraseIdx(0);
+
+    // Cycle a few realistic "thinking" phrases before the answer streams in.
+    const phraseInterval = setInterval(() => {
+      setThinkingPhraseIdx((v) => (v + 1) % thinkingPhrases.length);
+    }, 480);
+    timersRef.current.push(phraseInterval as unknown as ReturnType<typeof setTimeout>);
+
+    const thinkFor = randomBetween(1400, 1900);
+    const startStreaming = setTimeout(() => {
+      clearInterval(phraseInterval);
+      setAskPhase("streaming");
+
+      const words = askThisMarketPrompts[i].answer.split(" ");
+      let idx = 0;
+      const revealNext = () => {
+        idx += 1;
+        setDisplayedText(words.slice(0, idx).join(" "));
+        if (idx < words.length) {
+          const delay = randomBetween(20, 55);
+          const t = setTimeout(revealNext, delay);
+          timersRef.current.push(t);
+        } else {
+          setAskPhase("done");
+        }
+      };
+      revealNext();
+    }, thinkFor);
+    timersRef.current.push(startStreaming);
+  }
 
   return (
     <section
@@ -192,9 +248,12 @@ export function UnderstandPanel() {
             {askThisMarketPrompts.map((pr, i) => (
               <button
                 key={pr.question}
-                onClick={() => setAnswerIdx(i)}
-                className="rounded-full border bg-white px-2.5 py-1 text-[11.5px] font-medium text-gray-600 hover:border-gray-300"
-                style={{ borderColor: p.border }}
+                onClick={() => askQuestion(i)}
+                disabled={askPhase === "thinking" || askPhase === "streaming"}
+                className={`rounded-full border px-2.5 py-1 text-[11.5px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                  answerIdx === i ? "text-white" : "bg-white text-gray-600 hover:border-gray-300"
+                }`}
+                style={answerIdx === i ? { background: p.accent, borderColor: p.accent } : { borderColor: p.border }}
               >
                 {pr.question}
               </button>
@@ -208,13 +267,43 @@ export function UnderstandPanel() {
             />
             <Send size={14} className="text-gray-400" />
           </div>
-          {answerIdx !== null && (
+
+          {askPhase === "thinking" && (
+            <div className="flex items-center gap-2 rounded-lg border border-gray-100 bg-white/70 px-3 py-2.5">
+              <span className="relative flex h-5 w-5 shrink-0 items-center justify-center">
+                <span
+                  className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-40"
+                  style={{ background: p.accent }}
+                />
+                <Sparkles size={13} className="relative animate-pulse" style={{ color: p.accent }} />
+              </span>
+              <span className="text-[12px] font-medium text-gray-500 transition-opacity duration-300">
+                {thinkingPhrases[thinkingPhraseIdx]}
+              </span>
+              <span className="ml-auto flex gap-0.5">
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-gray-300 [animation-delay:0ms]" />
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-gray-300 [animation-delay:150ms]" />
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-gray-300 [animation-delay:300ms]" />
+              </span>
+            </div>
+          )}
+
+          {(askPhase === "streaming" || askPhase === "done") && answerIdx !== null && (
             <div className="rounded-lg bg-white/70 p-3">
-              <p className="text-[13px] text-gray-700">{askThisMarketPrompts[answerIdx].answer}</p>
-              <div className="mt-2.5 text-[10.5px] text-gray-400">Go deeper:</div>
-              <div className="mt-1.5">
-                <LinkRow links={askThisMarketPrompts[answerIdx].links} accent={p.accent} />
-              </div>
+              <p className="text-[13px] leading-relaxed text-gray-700">
+                {displayedText}
+                {askPhase === "streaming" && (
+                  <span className="ml-0.5 inline-block h-[13px] w-[2px] animate-pulse align-middle" style={{ background: p.accent }} />
+                )}
+              </p>
+              {askPhase === "done" && (
+                <>
+                  <div className="mt-2.5 text-[10.5px] text-gray-400">Go deeper:</div>
+                  <div className="mt-1.5">
+                    <LinkRow links={askThisMarketPrompts[answerIdx].links} accent={p.accent} />
+                  </div>
+                </>
+              )}
             </div>
           )}
         </div>

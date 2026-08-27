@@ -141,6 +141,16 @@ export interface AskPrompt {
   links: ExternalLink[];
 }
 
+// Cycled while the "Ask this market" answer is being generated, purely for
+// a realistic thinking animation — not a real processing pipeline.
+export const thinkingPhrases = [
+  "Reading the order book…",
+  "Cross-referencing recent news…",
+  "Weighing signal quality…",
+  "Drafting an answer…",
+];
+
+
 export type Audience = "trader" | "journalist" | "institution";
 
 export const audienceFraming: Record<
@@ -170,19 +180,19 @@ export const askThisMarketPrompts: AskPrompt[] = [
   {
     question: "Why did this probability rise?",
     answer:
-      "Weaker-than-expected employment data increased expectations of a 25 bps cut, pushing this outcome from 44% to 57% over three sessions.",
+      "This outcome moved from 44% to 57% over three trading sessions, and the timing lines up closely with two catalysts: weaker-than-expected employment data on Aug 21 and a cooler CPI print on Aug 12. Taken together, these releases appear to have strengthened the case for a near-term rate cut in traders' eyes. The move was gradual rather than a single spike, which is consistent with broad repricing across many participants rather than one large position pushing the price. Liquidity and spread held steady throughout the move, another sign the shift reflects genuine sentiment rather than a temporary imbalance.",
     links: externalLinks("Fed rate cut probability rise employment data"),
   },
   {
     question: "What could change this market next?",
     answer:
-      "The CPI release (Sep 10) and jobs report (Sep 5) are the next scheduled events most likely to move this market before the FOMC meeting.",
+      "Two scheduled releases stand out before the Sep 17 FOMC meeting: the Sep 5 jobs report and the Sep 10 CPI print. Either could meaningfully shift probability — a weak jobs number or a soft inflation read would likely reinforce the current lean toward a cut, while stronger prints on both could stall or reverse the recent move. Fed commentary scheduled for Sep 12 is also worth watching, since remarks made close to a meeting tend to be parsed closely for tone. If you're tracking this market, those three dates are the most likely points for a meaningful re-rating one way or the other.",
     links: externalLinks("September CPI jobs report Fed meeting schedule"),
   },
   {
     question: "What would make this outcome less likely?",
     answer:
-      "A hotter-than-expected inflation print or hawkish Fed commentary would reduce the case for a cut and could shift probability back toward \u201cno change.\u201d",
+      "A hotter-than-expected inflation print or a notably hawkish tone from Fed officials would be the most direct way this could reverse. Historically, moves of this size have partially unwound when subsequent data surprised in the opposite direction, so a single strong print may only dent the probability rather than erase it entirely. It's also worth watching how quickly liquidity and participation respond to any surprise — a fast, broad-based move would suggest the market is genuinely repricing its expectations, while a shift driven by just a handful of large trades would be a weaker signal.",
     links: externalLinks("hawkish Fed commentary inflation rate cut odds"),
   },
 ];
