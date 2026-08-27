@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Sparkles, Send, Newspaper, X as XIcon, ExternalLink } from "lucide-react";
+import { Sparkles, Send, Newspaper, X as XIcon, ExternalLink, Landmark } from "lucide-react";
 import {
   askThisMarketPrompts,
   audienceFraming,
+  personaLinks,
   thinkingPhrases,
   upcomingCatalysts,
   whyItMoved,
@@ -24,6 +25,12 @@ type AskPhase = "idle" | "thinking" | "streaming" | "done";
 function randomBetween(min: number, max: number) {
   return min + Math.random() * (max - min);
 }
+
+const personaIcon: Record<Audience, React.ReactNode> = {
+  trader: <Sparkles size={11} />,
+  journalist: <Newspaper size={11} />,
+  institution: <Landmark size={11} />,
+};
 
 function LinkRow({ links, accent }: { links: ExternalLinkType[]; accent: string }) {
   return (
@@ -47,9 +54,23 @@ function LinkRow({ links, accent }: { links: ExternalLinkType[]; accent: string 
   );
 }
 
+function PersonaBadge({ audience }: { audience: Audience }) {
+  const framing = audienceFraming[audience];
+  return (
+    <span
+      className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold text-white"
+      style={{ background: framing.accent }}
+    >
+      {personaIcon[audience]}
+      Answering as {framing.label}
+    </span>
+  );
+}
+
 export function UnderstandPanel() {
   const p = pillars.understand;
   const [audience, setAudience] = useState<Audience>("trader");
+  const personaAccent = audienceFraming[audience].accent;
   // Always land on "Why did this move?" — it's the most orienting answer for
   // a first-time viewer. Switching audience below can still re-emphasize a
   // different tab intentionally.
@@ -68,7 +89,7 @@ export function UnderstandPanel() {
 
   useEffect(() => clearTimers, []);
 
-  function askQuestion(i: number) {
+  function askQuestion(i: number, forAudience: Audience) {
     clearTimers();
     setAnswerIdx(i);
     setAskPhase("thinking");
@@ -86,7 +107,7 @@ export function UnderstandPanel() {
       clearInterval(phraseInterval);
       setAskPhase("streaming");
 
-      const words = askThisMarketPrompts[i].answer.split(" ");
+      const words = askThisMarketPrompts[i].answers[forAudience].text.split(" ");
       let idx = 0;
       const revealNext = () => {
         idx += 1;
@@ -102,6 +123,17 @@ export function UnderstandPanel() {
       revealNext();
     }, thinkFor);
     timersRef.current.push(startStreaming);
+  }
+
+  function selectAudience(a: Audience) {
+    // Switching persona mid-answer would otherwise show stale text under a
+    // new persona badge, so reset the ask flow along with the tab emphasis.
+    clearTimers();
+    setAskPhase("idle");
+    setAnswerIdx(null);
+    setDisplayedText("");
+    setAudience(a);
+    setTab(audienceFraming[a].emphasize);
   }
 
   return (
@@ -126,21 +158,23 @@ export function UnderstandPanel() {
       <div className="mb-3">
         <div className="mb-1.5 text-[10.5px] font-bold tracking-wide text-gray-400">VIEWING AS</div>
         <div className="flex flex-wrap gap-1.5">
-          {(Object.keys(audienceFraming) as Audience[]).map((a) => (
-            <button
-              key={a}
-              onClick={() => {
-                setAudience(a);
-                setTab(audienceFraming[a].emphasize);
-              }}
-              className={`rounded-full border px-2.5 py-1 text-[11.5px] font-bold transition-colors ${
-                audience === a ? "text-white" : "bg-white/70 text-gray-500 hover:border-gray-300"
-              }`}
-              style={audience === a ? { background: p.accent, borderColor: p.accent } : { borderColor: p.border }}
-            >
-              {audienceFraming[a].label}
-            </button>
-          ))}
+          {(Object.keys(audienceFraming) as Audience[]).map((a) => {
+            const framing = audienceFraming[a];
+            const active = audience === a;
+            return (
+              <button
+                key={a}
+                onClick={() => selectAudience(a)}
+                className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11.5px] font-bold transition-colors ${
+                  active ? "text-white" : "bg-white/70 text-gray-500 hover:border-gray-300"
+                }`}
+                style={active ? { background: framing.accent, borderColor: framing.accent } : { borderColor: p.border }}
+              >
+                {personaIcon[a]}
+                {framing.label}
+              </button>
+            );
+          })}
         </div>
         <p className="mt-1.5 text-[11.5px] leading-snug text-gray-500">{audienceFraming[audience].tagline}</p>
       </div>
@@ -159,7 +193,7 @@ export function UnderstandPanel() {
             className={`rounded-md px-2.5 py-1.5 transition-colors ${
               tab === id ? "bg-white shadow-sm" : "hover:bg-white/60"
             }`}
-            style={tab === id ? { color: p.accent } : undefined}
+            style={tab === id ? { color: personaAccent } : undefined}
           >
             {label}
           </button>
@@ -168,26 +202,30 @@ export function UnderstandPanel() {
 
       {tab === "why" && (
         <div className="flex flex-col gap-3">
-          <div className="rounded-lg bg-white/70 p-3 text-[13px] text-gray-700">
+          <div
+            className="rounded-lg border-l-[3px] bg-white/70 p-3 text-[13px] text-gray-700"
+            style={{ borderLeftColor: personaAccent }}
+          >
+            <div className="mb-1.5">
+              <PersonaBadge audience={audience} />
+            </div>
             <span className="font-semibold text-gray-900">{whyItMoved.headline}</span>
-            <p className="mt-1 text-gray-600">{whyItMoved.detail}</p>
+            <p className="mt-1 text-gray-600">{whyItMoved.perAudience[audience].detail}</p>
           </div>
 
           <div className="rounded-lg bg-white/70 p-3">
             <div className="mb-1.5 text-[11px] font-bold tracking-wide text-gray-400">WHAT PEOPLE ARE SAYING</div>
             <ul className="flex flex-col gap-1.5">
-              {whyItMoved.commentary.map((c) => (
+              {whyItMoved.perAudience[audience].commentary.map((c) => (
                 <li key={c} className="flex gap-1.5 text-[12.5px] text-gray-600">
-                  <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-gray-300" />
+                  <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full" style={{ background: personaAccent }} />
                   {c}
                 </li>
               ))}
             </ul>
-            <div className="mt-2.5 text-[10.5px] text-gray-400">
-              Summaries only — nothing here is a direct quote. Explore the sources yourself:
-            </div>
+            <div className="mt-2.5 text-[10.5px] text-gray-400">{audienceFraming[audience].linkIntro}</div>
             <div className="mt-1.5">
-              <LinkRow links={whyItMoved.links} accent={p.accent} />
+              <LinkRow links={personaLinks(whyItMoved.query, audience)} accent={personaAccent} />
             </div>
           </div>
         </div>
@@ -205,7 +243,7 @@ export function UnderstandPanel() {
                   className={`rounded-lg bg-white/70 p-2.5 text-left transition-colors ${
                     isOpen ? "ring-1" : "hover:bg-white"
                   }`}
-                  style={isOpen ? { boxShadow: `0 0 0 1px ${p.accent}` } : undefined}
+                  style={isOpen ? { boxShadow: `0 0 0 1px ${personaAccent}` } : undefined}
                 >
                   <div className="text-[11px] font-semibold text-gray-400">{c.date}</div>
                   <div className="text-[12.5px] font-bold text-gray-900">{c.label}</div>
@@ -216,20 +254,21 @@ export function UnderstandPanel() {
           </div>
 
           {openCatalyst && (
-            <div className="rounded-lg bg-white/70 p-3">
+            <div className="rounded-lg border-l-[3px] bg-white/70 p-3" style={{ borderLeftColor: personaAccent }}>
               {(() => {
                 const c = upcomingCatalysts.find((x) => x.label === openCatalyst)!;
                 return (
                   <>
-                    <div className="text-[11px] font-bold tracking-wide text-gray-400">
-                      {c.date.toUpperCase()} · WHAT TO WATCH
+                    <div className="mb-1.5 flex items-center justify-between">
+                      <div className="text-[11px] font-bold tracking-wide text-gray-400">
+                        {c.date.toUpperCase()} · WHAT TO WATCH
+                      </div>
+                      <PersonaBadge audience={audience} />
                     </div>
-                    <p className="mt-1 text-[12.5px] text-gray-700">{c.whatToWatch}</p>
-                    <div className="mt-2.5 text-[10.5px] text-gray-400">
-                      Research ahead of the date — commentary here is speculative, not scheduled fact:
-                    </div>
+                    <p className="mt-1 text-[12.5px] text-gray-700">{c.perAudience[audience]}</p>
+                    <div className="mt-2.5 text-[10.5px] text-gray-400">{audienceFraming[audience].linkIntro}</div>
                     <div className="mt-1.5">
-                      <LinkRow links={c.links} accent={p.accent} />
+                      <LinkRow links={personaLinks(c.query, audience)} accent={personaAccent} />
                     </div>
                   </>
                 );
@@ -248,12 +287,12 @@ export function UnderstandPanel() {
             {askThisMarketPrompts.map((pr, i) => (
               <button
                 key={pr.question}
-                onClick={() => askQuestion(i)}
+                onClick={() => askQuestion(i, audience)}
                 disabled={askPhase === "thinking" || askPhase === "streaming"}
                 className={`rounded-full border px-2.5 py-1 text-[11.5px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
                   answerIdx === i ? "text-white" : "bg-white text-gray-600 hover:border-gray-300"
                 }`}
-                style={answerIdx === i ? { background: p.accent, borderColor: p.accent } : { borderColor: p.border }}
+                style={answerIdx === i ? { background: personaAccent, borderColor: personaAccent } : { borderColor: p.border }}
               >
                 {pr.question}
               </button>
@@ -273,12 +312,15 @@ export function UnderstandPanel() {
               <span className="relative flex h-5 w-5 shrink-0 items-center justify-center">
                 <span
                   className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-40"
-                  style={{ background: p.accent }}
+                  style={{ background: personaAccent }}
                 />
-                <Sparkles size={13} className="relative animate-pulse" style={{ color: p.accent }} />
+                <Sparkles size={13} className="relative animate-pulse" style={{ color: personaAccent }} />
               </span>
               <span className="text-[12px] font-medium text-gray-500 transition-opacity duration-300">
                 {thinkingPhrases[thinkingPhraseIdx]}
+              </span>
+              <span className="ml-1 text-[10.5px] font-semibold text-gray-400">
+                as {audienceFraming[audience].label}
               </span>
               <span className="ml-auto flex gap-0.5">
                 <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-gray-300 [animation-delay:0ms]" />
@@ -289,18 +331,27 @@ export function UnderstandPanel() {
           )}
 
           {(askPhase === "streaming" || askPhase === "done") && answerIdx !== null && (
-            <div className="rounded-lg bg-white/70 p-3">
+            <div className="rounded-lg border-l-[3px] bg-white/70 p-3" style={{ borderLeftColor: personaAccent }}>
+              <div className="mb-1.5">
+                <PersonaBadge audience={audience} />
+              </div>
               <p className="text-[13px] leading-relaxed text-gray-700">
                 {displayedText}
                 {askPhase === "streaming" && (
-                  <span className="ml-0.5 inline-block h-[13px] w-[2px] animate-pulse align-middle" style={{ background: p.accent }} />
+                  <span
+                    className="ml-0.5 inline-block h-[13px] w-[2px] animate-pulse align-middle"
+                    style={{ background: personaAccent }}
+                  />
                 )}
               </p>
               {askPhase === "done" && (
                 <>
-                  <div className="mt-2.5 text-[10.5px] text-gray-400">Go deeper:</div>
+                  <div className="mt-2.5 text-[10.5px] text-gray-400">{audienceFraming[audience].linkIntro}</div>
                   <div className="mt-1.5">
-                    <LinkRow links={askThisMarketPrompts[answerIdx].links} accent={p.accent} />
+                    <LinkRow
+                      links={personaLinks(askThisMarketPrompts[answerIdx].answers[audience].query, audience)}
+                      accent={personaAccent}
+                    />
                   </div>
                 </>
               )}
