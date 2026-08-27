@@ -127,15 +127,13 @@ export function UnderstandPanel() {
 
   function selectAudience(a: Audience) {
     // Keep whatever tab and question the user already has open — switching
-    // persona should just re-render that same view with the new persona's
-    // answer, so it's easy to demo "same question, different persona".
+    // persona should just re-render that same view for the new persona,
+    // so it's easy to demo "same question, different persona".
     setAudience(a);
     if (answerIdx !== null) {
-      // Swap in the new persona's answer immediately rather than replaying
-      // the thinking/streaming animation, so the comparison feels instant.
-      clearTimers();
-      setAskPhase("done");
-      setDisplayedText(askThisMarketPrompts[answerIdx].answers[a].text);
+      // Re-run the thinking/streaming animation so it's obvious a fresh
+      // answer is being generated for the newly selected persona.
+      askQuestion(answerIdx, a);
     }
   }
 
