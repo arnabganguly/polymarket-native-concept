@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Bot, ChevronDown, Radio, RotateCcw, Send, Sparkles } from "lucide-react";
+import { Bot, ChevronDown, Radio, RotateCcw, Send, Sparkles, SquareArrowOutUpRight } from "lucide-react";
 import {
   aiAgentScenarios,
   distributionChannels,
   enhancedApiResponse,
   todayApiResponse,
+  tracebackHref,
+  tracebackLabel,
 } from "@/lib/distribute";
 import { InfoTooltip } from "@/components/info-tooltip";
 import { MapImpactChip } from "@/components/map-impact-chip";
@@ -115,8 +117,16 @@ export function DistributePanel() {
                 <div className="text-[11px] font-semibold text-emerald-600">▲ 8 pts</div>
               </div>
             </div>
-            <div className="mt-2 border-t border-gray-100 pt-2 text-[10.5px] text-gray-400">
-              Powered by Polymarket+ Intelligence · Conceptual
+            <div className="mt-2 flex items-center justify-between border-t border-gray-100 pt-2">
+              <span className="text-[10.5px] text-gray-400">Powered by Polymarket+ Intelligence · Conceptual</span>
+              <a
+                href={tracebackHref}
+                className="flex shrink-0 items-center gap-1 text-[10.5px] font-bold hover:underline"
+                style={{ color: p.accent }}
+              >
+                {tracebackLabel}
+                <SquareArrowOutUpRight size={10} />
+              </a>
             </div>
           </div>
 
@@ -216,6 +226,17 @@ export function DistributePanel() {
                   <GroundingChip label={scenario.response.change} accent={p.accent} />
                   <GroundingChip label={scenario.response.signal_quality} accent={p.accent} />
                   <GroundingChip label={`Next: ${scenario.response.next_catalyst}`} accent={p.accent} />
+                </div>
+
+                <div className="ml-8">
+                  <a
+                    href={tracebackHref}
+                    className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10.5px] font-bold text-white shadow-sm"
+                    style={{ background: p.accent }}
+                  >
+                    {tracebackLabel}
+                    <SquareArrowOutUpRight size={10} />
+                  </a>
                 </div>
 
                 <div className="ml-8 flex items-center gap-3">

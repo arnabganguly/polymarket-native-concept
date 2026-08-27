@@ -25,6 +25,12 @@ export const distributionChannels = [
   { label: "AI agents", note: "Automated decisioning" },
 ];
 
+// TRACEBACK — every surface the intelligence reaches (widget, AI answer)
+// carries a link back to the live market on Polymarket, turning passive
+// reach into a direct acquisition funnel instead of a dead end.
+export const tracebackHref = "#section-market";
+export const tracebackLabel = "View on Polymarket";
+
 // AI AGENT demo — shows a third-party agent (e.g. a portfolio assistant or
 // research bot) calling the conceptual intelligence API and turning the
 // structured payload into a grounded, sourced answer, rather than a
