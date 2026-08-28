@@ -72,6 +72,11 @@ export interface AgentPersona {
   label: string;
   role: string;
   description: string;
+  // Matches lib/intelligence.ts's audienceFraming accents (trader/journalist/
+  // institution) so a persona's color means the same thing everywhere in
+  // the deck, not just within this panel.
+  accent: string;
+  wash: string;
   scenarios: AgentScenario[];
 }
 
@@ -81,6 +86,8 @@ export const aiAgentPersonas: AgentPersona[] = [
     label: "Trader",
     role: "Trading copilot",
     description: "Wants speed and edge: how fast is this moving, and is there a trade in it right now.",
+    accent: "#1652F0",
+    wash: "#EEF3FF",
     scenarios: [
       {
         id: "trader-momentum",
@@ -137,6 +144,8 @@ Authorization: ******`,
     label: "Journalist",
     role: "Newsroom fact-check agent",
     description: "Wants an accurate, citable, well-caveated line for a story — not raw numbers.",
+    accent: "#B45309",
+    wash: "#FEF6EA",
     scenarios: [
       {
         id: "journalist-citation",
@@ -193,6 +202,8 @@ Authorization: ******`,
     label: "Institution / Risk",
     role: "Portfolio risk monitor",
     description: "Wants trust, exposure, and downside scenarios before acting on the signal.",
+    accent: "#4338CA",
+    wash: "#F0EFFD",
     scenarios: [
       {
         id: "institution-trust",

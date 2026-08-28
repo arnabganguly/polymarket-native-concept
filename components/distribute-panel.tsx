@@ -1,7 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Bot, ChevronDown, Radio, RotateCcw, Send, Sparkles, SquareArrowOutUpRight } from "lucide-react";
+import {
+  Bot,
+  ChevronDown,
+  Landmark,
+  Newspaper,
+  Radio,
+  RotateCcw,
+  Send,
+  Sparkles,
+  SquareArrowOutUpRight,
+} from "lucide-react";
 import {
   agentThinkingPhrases,
   aiAgentPersonas,
@@ -17,6 +27,12 @@ import { pillars } from "@/lib/pillars";
 import { selectedOutcome } from "@/lib/market";
 
 type AgentPhase = "idle" | "thinking" | "streaming" | "answered";
+
+const personaIcon: Record<string, React.ReactNode> = {
+  trader: <Sparkles size={12} />,
+  journalist: <Newspaper size={12} />,
+  institution: <Landmark size={12} />,
+};
 
 function randomBetween(min: number, max: number) {
   return min + Math.random() * (max - min);
@@ -107,7 +123,10 @@ export function DistributePanel() {
     <section
       id="section-distribute"
       className="rounded-xl border p-4"
-      style={{ background: p.wash, borderColor: p.border }}
+      style={{
+        background: `linear-gradient(160deg, ${p.wash} 0%, #ffffff 55%, ${p.wash} 100%)`,
+        borderColor: p.border,
+      }}
     >
       <div className="mb-3 flex items-center gap-1.5 text-[11px] font-bold tracking-wide" style={{ color: p.accent }}>
         <Radio size={14} />
@@ -117,7 +136,10 @@ export function DistributePanel() {
       <MapImpactChip accent={p.accent} driver={p.mapDriver} impact={p.mapImpact} />
 
       {/* SOURCE: the one API, extended with interpretive fields */}
-      <div className="rounded-lg border bg-white/70 p-3.5" style={{ borderColor: p.border }}>
+      <div
+        className="rounded-lg border bg-white/80 p-3.5 shadow-sm"
+        style={{ borderColor: p.border }}
+      >
         <div className="mb-2 flex items-center gap-1.5 text-[12px] font-bold text-gray-900">
           API
           <span className="rounded-full bg-gray-100 px-1.5 py-0.5 text-[9px] font-bold text-gray-500">
@@ -148,16 +170,16 @@ export function DistributePanel() {
 
       {/* CONNECTOR: makes explicit that both consumers below share one source */}
       <div className="my-3 flex items-center gap-2 px-1">
-        <div className="h-px flex-1" style={{ background: p.border }} />
-        <span className="text-[10.5px] font-bold tracking-wide text-gray-400">
+        <div className="h-px flex-1" style={{ background: `linear-gradient(90deg, transparent, ${p.accent}55)` }} />
+        <span className="rounded-full bg-white/60 px-2 py-0.5 text-[10.5px] font-bold tracking-wide" style={{ color: p.accent }}>
           ONE API · TWO KINDS OF CONSUMERS
         </span>
-        <div className="h-px flex-1" style={{ background: p.border }} />
+        <div className="h-px flex-1" style={{ background: `linear-gradient(90deg, ${p.accent}55, transparent)` }} />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
         {/* CONSUMER 1: humans, via a widget */}
-        <div className="rounded-lg border bg-white/70 p-3.5" style={{ borderColor: p.border }}>
+        <div className="rounded-lg border bg-white/80 p-3.5 shadow-sm" style={{ borderColor: p.border }}>
           <div className="mb-2 flex items-center gap-1.5 text-[12px] font-bold text-gray-900">
             Embeddable widget
             <span className="rounded-full bg-gray-100 px-1.5 py-0.5 text-[9px] font-bold text-gray-500">
@@ -203,8 +225,11 @@ export function DistributePanel() {
 
         {/* CONSUMER 2: AI agents, via structured reasoning, not a UI at all */}
         <div
-          className="rounded-lg border p-3.5"
-          style={{ borderColor: p.accent + "44", background: "linear-gradient(180deg, #ffffff 0%, " + p.wash + " 100%)" }}
+          className="rounded-lg border p-3.5 shadow-sm transition-colors duration-300"
+          style={{
+            borderColor: persona.accent + "40",
+            background: `linear-gradient(165deg, ${persona.wash} 0%, #ffffff 45%, #ffffff 100%)`,
+          }}
         >
           <div className="mb-2 flex items-center gap-1.5 text-[12px] font-bold text-gray-900">
             <Sparkles size={13} style={{ color: p.accent }} />
@@ -229,15 +254,16 @@ export function DistributePanel() {
                   <button
                     key={persona_.id}
                     onClick={() => selectPersona(persona_.id)}
-                    className={`rounded-full border px-2.5 py-1 text-[11px] font-bold transition-colors ${
-                      personaId === persona_.id ? "text-white" : "bg-white text-gray-600 hover:border-gray-300"
+                    className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold transition-colors ${
+                      personaId === persona_.id ? "text-white shadow-sm" : "bg-white/80 text-gray-600 hover:border-gray-300"
                     }`}
                     style={
                       personaId === persona_.id
-                        ? { background: "#111827", borderColor: "#111827" }
-                        : { borderColor: p.border }
+                        ? { background: persona_.accent, borderColor: persona_.accent }
+                        : { borderColor: persona_.accent + "33" }
                     }
                   >
+                    {personaIcon[persona_.id]}
                     {persona_.label}
                   </button>
                 ))}
@@ -252,12 +278,12 @@ export function DistributePanel() {
                   key={s.id}
                   onClick={() => selectScenario(s.id)}
                   className={`rounded-full border px-2.5 py-1 text-[10.5px] font-semibold transition-colors ${
-                    scenarioId === s.id ? "text-white" : "bg-white text-gray-500 hover:border-gray-300"
+                    scenarioId === s.id ? "text-white" : "bg-white/80 text-gray-500 hover:border-gray-300"
                   }`}
                   style={
                     scenarioId === s.id
-                      ? { background: p.accent, borderColor: p.accent }
-                      : { borderColor: p.border }
+                      ? { background: persona.accent, borderColor: persona.accent }
+                      : { borderColor: persona.accent + "33" }
                   }
                 >
                   {s.query.length > 38 ? s.query.slice(0, 36) + "…" : s.query}
@@ -267,8 +293,17 @@ export function DistributePanel() {
 
             {/* user turn */}
             <div className="flex flex-col items-end gap-1 self-end">
-              <span className="text-[10px] font-semibold text-gray-400">{scenario.askedBy}</span>
-              <div className="max-w-[90%] rounded-2xl rounded-tr-sm bg-gray-900 px-3 py-2 text-[12.5px] text-white shadow-sm">
+              <span
+                className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold text-white"
+                style={{ background: persona.accent }}
+              >
+                {personaIcon[persona.id]}
+                {scenario.askedBy}
+              </span>
+              <div
+                className="max-w-[90%] rounded-2xl rounded-tr-sm px-3 py-2 text-[12.5px] text-white shadow-sm"
+                style={{ background: persona.accent }}
+              >
                 {scenario.query}
               </div>
             </div>
@@ -277,20 +312,23 @@ export function DistributePanel() {
               <button
                 onClick={runQuery}
                 className="flex items-center gap-1.5 self-start rounded-full px-3 py-1.5 text-[11px] font-bold text-white shadow-sm"
-                style={{ background: p.accent }}
+                style={{ background: persona.accent }}
               >
                 <Send size={11} /> Let the agent answer
               </button>
             )}
 
             {phase === "thinking" && (
-              <div className="flex items-center gap-2 self-start rounded-2xl rounded-tl-sm border border-gray-200 bg-white px-3 py-2 text-[11.5px] text-gray-400 shadow-sm">
+              <div
+                className="flex items-center gap-2 self-start rounded-2xl rounded-tl-sm border bg-white px-3 py-2 text-[11.5px] text-gray-400 shadow-sm"
+                style={{ borderColor: persona.accent + "33" }}
+              >
                 <span className="relative flex h-5 w-5 shrink-0 items-center justify-center">
                   <span
                     className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-40"
-                    style={{ background: p.accent }}
+                    style={{ background: persona.accent }}
                   />
-                  <Bot size={13} className="relative" style={{ color: p.accent }} />
+                  <Bot size={13} className="relative" style={{ color: persona.accent }} />
                 </span>
                 <span className="transition-opacity duration-300">{agentThinkingPhrases[thinkingPhraseIdx]}</span>
                 <span className="ml-auto flex gap-0.5">
@@ -305,17 +343,32 @@ export function DistributePanel() {
               <>
                 {/* agent turn — streams in word by word, like a real LLM response */}
                 <div className="flex items-start gap-2 self-start">
-                  <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-white" style={{ background: p.accent }}>
+                  <div
+                    className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-white"
+                    style={{ background: persona.accent }}
+                  >
                     <Bot size={12} />
                   </div>
-                  <div className="max-w-[92%] rounded-2xl rounded-tl-sm border border-gray-200 bg-white px-3 py-2 text-[12.5px] leading-relaxed text-gray-700 shadow-sm">
-                    {displayedText}
-                    {phase === "streaming" && (
-                      <span
-                        className="ml-0.5 inline-block h-[13px] w-[2px] animate-pulse align-middle"
-                        style={{ background: p.accent }}
-                      />
-                    )}
+                  <div className="flex max-w-[92%] flex-col gap-1">
+                    <span
+                      className="inline-flex w-fit items-center gap-1 rounded-full px-2 py-0.5 text-[9.5px] font-bold text-white"
+                      style={{ background: persona.accent }}
+                    >
+                      {personaIcon[persona.id]}
+                      Answering as {persona.label}
+                    </span>
+                    <div
+                      className="rounded-2xl rounded-tl-sm border bg-white px-3 py-2 text-[12.5px] leading-relaxed text-gray-700 shadow-sm"
+                      style={{ borderColor: persona.accent + "33", borderLeftWidth: 3, borderLeftColor: persona.accent }}
+                    >
+                      {displayedText}
+                      {phase === "streaming" && (
+                        <span
+                          className="ml-0.5 inline-block h-[13px] w-[2px] animate-pulse align-middle"
+                          style={{ background: persona.accent }}
+                        />
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -323,17 +376,17 @@ export function DistributePanel() {
                   <>
                     {/* grounding chips — same fields as the API card, shown as evidence not a JSON dump */}
                     <div className="ml-8 flex flex-wrap gap-1.5">
-                      <GroundingChip label={`${Math.round(scenario.response.probability * 100)}% probability`} accent={p.accent} />
-                      <GroundingChip label={scenario.response.change} accent={p.accent} />
-                      <GroundingChip label={scenario.response.signal_quality} accent={p.accent} />
-                      <GroundingChip label={`Next: ${scenario.response.next_catalyst}`} accent={p.accent} />
+                      <GroundingChip label={`${Math.round(scenario.response.probability * 100)}% probability`} accent={persona.accent} />
+                      <GroundingChip label={scenario.response.change} accent={persona.accent} />
+                      <GroundingChip label={scenario.response.signal_quality} accent={persona.accent} />
+                      <GroundingChip label={`Next: ${scenario.response.next_catalyst}`} accent={persona.accent} />
                     </div>
 
                     <div className="ml-8">
                       <a
                         href={tracebackHref}
                         className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10.5px] font-bold text-white shadow-sm"
-                        style={{ background: p.accent }}
+                        style={{ background: persona.accent }}
                       >
                         {tracebackLabel}
                         <SquareArrowOutUpRight size={10} />
@@ -382,8 +435,8 @@ export function DistributePanel() {
 function GroundingChip({ label, accent }: { label: string; accent: string }) {
   return (
     <span
-      className="rounded-full border bg-white px-2 py-0.5 text-[10.5px] font-semibold text-gray-700"
-      style={{ borderColor: accent + "44" }}
+      className="rounded-full border px-2 py-0.5 text-[10.5px] font-semibold"
+      style={{ borderColor: accent + "55", background: accent + "14", color: accent }}
     >
       {label}
     </span>
