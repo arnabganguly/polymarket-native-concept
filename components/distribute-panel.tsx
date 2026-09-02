@@ -25,6 +25,7 @@ import { InfoTooltip } from "@/components/info-tooltip";
 import { MapImpactChip } from "@/components/map-impact-chip";
 import { pillars } from "@/lib/pillars";
 import { selectedOutcome } from "@/lib/market";
+import { PillarHeader } from "@/components/pillar-header";
 
 type AgentPhase = "idle" | "thinking" | "streaming" | "answered";
 
@@ -128,10 +129,7 @@ export function DistributePanel() {
         borderColor: p.border,
       }}
     >
-      <div className="mb-3 flex items-center gap-1.5 text-[11px] font-bold tracking-wide" style={{ color: p.accent }}>
-        <Radio size={14} />
-        DISTRIBUTE · {p.concept.toUpperCase()}
-      </div>
+      <PillarHeader icon={<Radio size={12} />} pillarLabel="DISTRIBUTE" capability={p.concept} accent={p.accent} />
 
       <MapImpactChip accent={p.accent} driver={p.mapDriver} impact={p.mapImpact} />
 

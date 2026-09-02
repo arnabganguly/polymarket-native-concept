@@ -15,6 +15,7 @@ import {
 import { InfoTooltip } from "@/components/info-tooltip";
 import { MapImpactChip } from "@/components/map-impact-chip";
 import { pillars } from "@/lib/pillars";
+import { PillarHeader } from "@/components/pillar-header";
 
 type Tab = "why" | "next" | "ask";
 type AskPhase = "idle" | "thinking" | "streaming" | "done";
@@ -144,14 +145,18 @@ export function UnderstandPanel() {
       style={{ background: p.wash, borderColor: p.border }}
     >
       <div className="mb-3 flex items-center justify-between">
-        <div className="flex items-center gap-1.5 text-[11px] font-bold tracking-wide" style={{ color: p.accent }}>
-          <Sparkles size={14} />
-          UNDERSTAND · {p.concept.toUpperCase()}
-          <InfoTooltip
-            accent={p.accent}
-            text="Lightweight context about what may be moving this market and what could move it next, plus real links out to social and news coverage so you can dig further. Not investment advice, and not a prediction."
-          />
-        </div>
+        <PillarHeader
+          icon={<Sparkles size={12} />}
+          pillarLabel="UNDERSTAND"
+          capability={p.concept}
+          accent={p.accent}
+          tooltip={
+            <InfoTooltip
+              accent={p.accent}
+              text="Lightweight context about what may be moving this market and what could move it next, plus real links out to social and news coverage so you can dig further. Not investment advice, and not a prediction."
+            />
+          }
+        />
       </div>
 
       <MapImpactChip accent={p.accent} driver={p.mapDriver} impact={p.mapImpact} />

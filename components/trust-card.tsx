@@ -5,6 +5,7 @@ import { trustBand, trustBandCopy, trustFactors, trustSignal, type TrustBand } f
 import { InfoTooltip } from "@/components/info-tooltip";
 import { MapImpactChip } from "@/components/map-impact-chip";
 import { pillars } from "@/lib/pillars";
+import { PillarHeader } from "@/components/pillar-header";
 
 const bandStyles: Record<TrustBand, { bar: string; text: string; badge: string }> = {
   high: { bar: "bg-emerald-500", text: "text-emerald-700", badge: "bg-emerald-500 text-white" },
@@ -24,11 +25,13 @@ export function TrustCard() {
       style={{ background: p.wash, borderColor: p.border }}
     >
       <div className="mb-3 flex items-center justify-between">
-        <div className="flex items-center gap-1.5 text-[11px] font-bold tracking-wide" style={{ color: p.accent }}>
-          <ShieldCheck size={14} />
-          TRUST · {p.concept.toUpperCase()}
-          <InfoTooltip accent={p.accent} text={trustSignal.infoTooltip} />
-        </div>
+        <PillarHeader
+          icon={<ShieldCheck size={12} />}
+          pillarLabel="TRUST"
+          capability={p.concept}
+          accent={p.accent}
+          tooltip={<InfoTooltip accent={p.accent} text={trustSignal.infoTooltip} />}
+        />
       </div>
 
       <MapImpactChip accent={p.accent} driver={p.mapDriver} impact={p.mapImpact} />

@@ -6,6 +6,7 @@ import { automationCapabilities, fundingMethods, fundingSteps, sampleAlert } fro
 import { InfoTooltip } from "@/components/info-tooltip";
 import { MapImpactChip } from "@/components/map-impact-chip";
 import { pillars } from "@/lib/pillars";
+import { PillarHeader, SubCapabilityLabel } from "@/components/pillar-header";
 
 export function ParticipatePanel() {
   const p = pillars.participate;
@@ -18,10 +19,12 @@ export function ParticipatePanel() {
       className="rounded-xl border p-4"
       style={{ background: p.wash, borderColor: p.border }}
     >
-      <div className="mb-3 flex items-center gap-1.5 text-[11px] font-bold tracking-wide" style={{ color: p.accent }}>
-        <Zap size={14} />
-        PARTICIPATE · {p.concept.toUpperCase()}
-      </div>
+      <PillarHeader
+        icon={<Zap size={12} />}
+        pillarLabel="PARTICIPATE"
+        capability={p.concept}
+        accent={p.accent}
+      />
 
       <MapImpactChip accent={p.accent} driver={p.mapDriver} impact={p.mapImpact} />
 
@@ -29,7 +32,7 @@ export function ParticipatePanel() {
         {/* SUB SECTION A: Frictionless Trading */}
         <div className="rounded-lg border bg-white/70 p-3.5" style={{ borderColor: p.border }}>
           <div className="mb-2 flex items-center gap-1.5 text-[12.5px] font-bold text-gray-900">
-            Frictionless Trading
+            <SubCapabilityLabel label="Frictionless Trading" accent={p.accent} />
             <InfoTooltip
               accent={p.accent}
               text="From fiat-adjacent to fiat-native: choose an outcome, choose an amount, pick a funding method, done. Reduces friction, not investment risk."
@@ -69,7 +72,7 @@ export function ParticipatePanel() {
         {/* SUB SECTION B: Trading Automation */}
         <div className="rounded-lg border bg-white/70 p-3.5" style={{ borderColor: p.border }}>
           <div className="mb-2 flex items-center gap-1.5 text-[12.5px] font-bold text-gray-900">
-            Trading Automation
+            <SubCapabilityLabel label="Trading Automation" accent={p.accent} />
             <InfoTooltip
               accent={p.accent}
               text="Ways to manage a position automatically as probabilities evolve — some available today, some proposed."
