@@ -26,10 +26,10 @@ export function ParticipatePanel() {
       <MapImpactChip accent={p.accent} driver={p.mapDriver} impact={p.mapImpact} />
 
       <div className="grid gap-4 md:grid-cols-2">
-        {/* SUB SECTION A: Seamless Funding */}
+        {/* SUB SECTION A: Frictionless Trading */}
         <div className="rounded-lg border bg-white/70 p-3.5" style={{ borderColor: p.border }}>
           <div className="mb-2 flex items-center gap-1.5 text-[12.5px] font-bold text-gray-900">
-            Seamless Funding
+            Frictionless Trading
             <InfoTooltip
               accent={p.accent}
               text="From fiat-adjacent to fiat-native: choose an outcome, choose an amount, pick a funding method, done. Reduces friction, not investment risk."
@@ -66,10 +66,10 @@ export function ParticipatePanel() {
           )}
         </div>
 
-        {/* SUB SECTION B: Better Trading Automation */}
+        {/* SUB SECTION B: Trading Automation */}
         <div className="rounded-lg border bg-white/70 p-3.5" style={{ borderColor: p.border }}>
           <div className="mb-2 flex items-center gap-1.5 text-[12.5px] font-bold text-gray-900">
-            Better Trading Automation
+            Trading Automation
             <InfoTooltip
               accent={p.accent}
               text="Ways to manage a position automatically as probabilities evolve — some available today, some proposed."

@@ -1,4 +1,4 @@
-// DISTRIBUTE — Probability Everywhere (proposed conceptual API + widget)
+// DISTRIBUTE — Polymarket Everywhere (proposed conceptual API + widget)
 
 export const todayApiResponse = `GET /markets/fed-rate-decision
 

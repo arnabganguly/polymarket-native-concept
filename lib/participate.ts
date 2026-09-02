@@ -1,4 +1,4 @@
-// PARTICIPATE — Seamless Funding + Better Trading Automation
+// PARTICIPATE — Frictionless Trading + Trading Automation
 
 export const fundingMethods = [
   { id: "apple-pay", label: "Apple Pay" },

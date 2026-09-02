@@ -26,7 +26,7 @@ export const pillars: Record<PillarId, Pillar> = {
   trust: {
     id: "trust",
     label: "TRUST",
-    concept: "Integrity Hardening",
+    concept: "Signal Quality",
     wash: "#FFF4F5",
     border: "#FBDADD",
     accent: "#C21B3D",
@@ -37,7 +37,7 @@ export const pillars: Record<PillarId, Pillar> = {
   participate: {
     id: "participate",
     label: "PARTICIPATE",
-    concept: "Frictionless Access & Automation",
+    concept: "Frictionless Trading & Trading Automation",
     wash: "#F1F7FF",
     border: "#D7E9FF",
     accent: "#1652F0",
@@ -48,7 +48,7 @@ export const pillars: Record<PillarId, Pillar> = {
   distribute: {
     id: "distribute",
     label: "DISTRIBUTE",
-    concept: "Probability Everywhere",
+    concept: "Polymarket Everywhere",
     wash: "#F5F6FA",
     border: "#E2E4EE",
     accent: "#3D4258",

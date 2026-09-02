@@ -1,4 +1,4 @@
-// TRUST — Integrity Hardening (proposed)
+// TRUST — Signal Quality (proposed)
 // Communicates confidence in the *market's structural health*, not whether
 // the outcome will be correct. That distinction is intentional and must be
 // preserved in all copy. Every score below is 0-100; colors and labels are
