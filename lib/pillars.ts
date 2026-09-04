@@ -37,7 +37,7 @@ export const pillars: Record<PillarId, Pillar> = {
   participate: {
     id: "participate",
     label: "PARTICIPATE",
-    concept: "Frictionless Trading & Trading Automation",
+    concept: "Frictionless Trading",
     wash: "#F1F7FF",
     border: "#D7E9FF",
     accent: "#1652F0",

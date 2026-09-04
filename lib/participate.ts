@@ -1,4 +1,4 @@
-// PARTICIPATE — Frictionless Trading + Trading Automation
+// PARTICIPATE — Frictionless Trading (Jurisdiction Native Funding + Trading Automation)
 
 export const fundingMethods = [
   { id: "apple-pay", label: "Apple Pay" },

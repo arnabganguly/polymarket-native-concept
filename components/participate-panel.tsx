@@ -29,10 +29,10 @@ export function ParticipatePanel() {
       <MapImpactChip accent={p.accent} driver={p.mapDriver} impact={p.mapImpact} />
 
       <div className="grid gap-4 md:grid-cols-2">
-        {/* SUB SECTION A: Frictionless Trading */}
+        {/* SUB SECTION A: Jurisdiction Native Funding */}
         <div className="rounded-lg border bg-white/70 p-3.5" style={{ borderColor: p.border }}>
           <div className="mb-2 flex items-center gap-1.5 text-[12.5px] font-bold text-gray-900">
-            <SubCapabilityLabel label="Frictionless Trading" accent={p.accent} />
+            <SubCapabilityLabel label="Jurisdiction Native Funding" accent={p.accent} />
             <InfoTooltip
               accent={p.accent}
               text="From fiat-adjacent to fiat-native: choose an outcome, choose an amount, pick a funding method, done. Reduces friction, not investment risk."
