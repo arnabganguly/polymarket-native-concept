@@ -1,7 +1,7 @@
 # Polymarket+ — Product Concept Prototype
 
 A high-fidelity, Polymarket-inspired product concept prototype built for a
-Roundtable Research interview. It starts from Polymarket's existing
+Roundtable Research. It starts from Polymarket's existing
 market page UX and extends it with four proposed strategic pillars —
 **Understand, Trust, Participate, Distribute** — designed to feel like a
 native evolution of the product rather than a bolted-on research tool.
